@@ -1,16 +1,16 @@
 ---
 layout: page
 title: About me
-subtitle: Why you'd want to go on a date with me
+subtitle: The essentials
 ---
 
-My name is Inigo Montoya. I have the following qualities:
+My name is Weihao Yin. Here are are few things about me:
 
-- I rock a great mustache
-- I'm extremely loyal to my family
+**Work**: Since July 2014, I have been working as a travel modeler at [AECOM]. I use data analytics and computer simulation to solve transportation-related problems. Prior to that, I pursued my Ph.D in Virginia Tech doing research on travel behavior.
 
-What else do you need?
+**Education**: I obtained my Ph.D in transportation systems engineering at Virginia Tech in the U.S in 2013. For my doctoral thesis, I developed a demand model system that forecast evacuation demand using agent-based modeling approach. See more about my research in the [Projects][proj-research] page.
 
-### my history
+**Hobbies**: Soccer (A Real Madrid Fan!!). 
 
-To be honest, I'm having some trouble remembering right now, so why don't you just watch [my movie](http://en.wikipedia.org/wiki/The_Princess_Bride_%28film%29) and it will answer **all** your questions.
+[AECOM]: https://aecom.com/
+[proj-research]: /projects.html#research
