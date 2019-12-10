@@ -8,7 +8,7 @@ Here are some selected publications. See all of my publications in [Google Schol
 **An agent-based modeling system for travel demand simulation for hurricane evacuation**  
 Weihao Yin, Pamela Murray-Tuite, Satish Ukkusuri, Hugh Gladwin  
 Transportation Research Part C: Emerging Technologies 42, 44-59 (2014)  
-[DOI](doi.org/10.1016/j.trc.2014.02.015) | [Blog](https://xys234.github.io/posts/2017/02/28/2015-02-28-test-markdown.html)
+[DOI](doi.org/10.1016/j.trc.2014.02.015) | [Blog](./aboutme.md)
 
 **Imputing erroneous data of single-station loop detectors for nonincident conditions: Comparison between temporal and spatial methods**  
 Weihao Yin, Pamela Murray-Tuite, Hesham Rakha  
