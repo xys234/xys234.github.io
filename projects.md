@@ -1,15 +1,70 @@
 # Projects
 
+## Data Science
 
-## Modeling Travel Behavior
+### <span style="color:blue"> Employee Commuting Mode Choice
+
+* _**Objective**_: Predict the mode of commuting trips and use the predictions to explore various commuting subsidy policies.
+*  _**Data**_: Coordinate pairs describing home and work locations. 
+* _**Models**_: 
+   * Logistic regression model.
+*  _**Tools**_: Python / Flask
+* _**Design**_:  
+   * The project has two components.
+     * The backend first obtains the routes for driving and transit for each OD by querying Google Directions API and then a predictive model 
+     * The predictive model is used to forecast the mode for each trip. 
+     * The frontend is built with Flask with embedded Bokeh visualizations. 
+* _**Application**_: Various cities.  
+   ![Commuter Benefits Planning](./img/commuter_benefits.png)
+
+### <span style="color:blue"> TNC Rider Churn
+
+* _**Objective**_: Predict rider churn.
+
+
+## Software
+
+### <span style="color:blue"> ConvertTrips 
+
+* _**Objective**_: This program produces detailed travel itineraies for about 19 million trips based on input origin-destination trip estimates and departure time distribution.
+*  _**Design**_: A console program that takes a control file as an input which specifies processing parameters as key-value pairs. 
+*  _**Tools**_: Python / Cython
+* _**Application**_: Houston.
+
+
+## Research on Travel Behavior
 
 Here are some selected publications. See all of my publications in [Google Scholar](https://scholar.google.com/citations?user=Kkq8saIAAAAJ&hl=en).
 
+### <span style="color:blue"> Estimate Evacuation Demand for a Region   
+* _**Objective**_: Predict the travel demand including evacuation preparations and final evacuation.
+*  _**Data**_: Surveys
+* _**Models**_: 
+   * Logistic regression model.
+   * Survival model
+   * Generalized linear model
+*  _**Tools**_: C++
+* _**Takeaways**_:  
+   * The model is able to produce travel plans that detailed the evacuation preparations such as withdrawing money and buy food. The distributions of evacuation decisions, when aggregated, are close to surveys.  
+   ![Agent-based Models](./img/trc-1.png)
+* _**Application**_: Miami.  
+* _**Publication**_:   
 **An agent-based modeling system for travel demand simulation for hurricane evacuation**  
 Weihao Yin, Pamela Murray-Tuite, Satish Ukkusuri, Hugh Gladwin  
 Transportation Research Part C: Emerging Technologies 42, 44-59 (2014)  
 [DOI](doi.org/10.1016/j.trc.2014.02.015) | [Blog](./_posts/2015-02-28-test-markdown.md)
 
+### <span style="color:blue"> Impute Missing Data in Freeway Traffic Volume Data   
+* _**Objective**_: Compare and Contrast different imputation schemes for traffic volume data.
+*  _**Data**_: Loop detector time-series data
+* _**Models**_: 
+   * Linear regression model and Kernal regression model.
+   * The models are compared using MAPE and MAE
+*  _**Tools**_: SQL
+* _**Takeaways**_:  
+   * The regression model using the temporal features shows the best performance.  
+* _**Application**_: Interstate-66 in Virginia.  
+* _**Publication**_:   
 **Imputing erroneous data of single-station loop detectors for nonincident conditions: Comparison between temporal and spatial methods**  
 Weihao Yin, Pamela Murray-Tuite, Hesham Rakha  
 Journal of Intelligent Transportation Systems 16(3), 159-176 (2012)  
@@ -51,14 +106,19 @@ Weihao Yin, Pamela Murray-Tuite, Kris Wernstedt
 Journal of Transportation Engineering 138(10), (2012)  
 [DOI](doi.org/10.1061/(ASCE)TE.1943-5436.0000431) | [Blog]()
 
+### <span style="color:blue"> Predicting Number of Vehicles Used in an Evacuation   
+* _**Objective**_: Predict how many vehicles a household would use for an evacuation.
+*  _**Data**_: Survey
+* _**Models**_: 
+   * Generalized Linear Model  
+*  _**Tools**_: 
+* _**Takeaways**_:  
+   * The traffic volume on the off-ramp to the parallel road surges after the accident occurs and later subsides to normal after 30 minutes as shown in the figure below.  
+   * Travelers are more likely to divert to a different road under severe accident. Trips on weekends are more likely to divert. 
+* _**Application**_: Interstate-66/US-50 corridor in Virginia.  
+* _**Publication**_:   
 **Statistical analysis of the number of household vehicles used for Hurricane Ivan evacuation**  
 Weihao Yin, Pamela Murray-Tuite, Hugh Gladwin  
 Journal of Transportation Engineering 140(12), (2012)   
 [DOI](doi.org/10.1061/(ASCE)TE.1943-5436.0000713) | [Blog]()
 
-**Risk reduction impact of connected vehicle technology on regional hurricane evacuations: A simulation study**  
-Weihao Yin, Gustave Cordahi, David Roden, Brian Wolshon  
-International Journal of Disaster Risk Reduction 31, 1245-1253 (2018)   
-[DOI](doi.org/10.1016/j.ijdrr.2018.01.013) | [Blog]()
-
-## Da S Projects
