@@ -20,7 +20,7 @@ description: Weihao's Personal Website
 
 # List of links in the navigation bar
 navbar-links:
-  Home: "blog"
+  Home: "index"
   Blog: "blog"
   Projects: "projects"
 
