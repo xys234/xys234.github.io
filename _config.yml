@@ -4,7 +4,7 @@
 title: Weihao Yin
 
 # Short description of your site
-description: Weihao's Personal website and blog
+description: Weihao's Personal Website
 
 # --- Local development options ---
 # If your website is hosted locally rather than on GitHub, then you need to uncomment the next two parameters to set the url and baseurl
@@ -20,7 +20,7 @@ description: Weihao's Personal website and blog
 
 # List of links in the navigation bar
 navbar-links:
-  Home: ""
+  Home: "index"
   Blog: "blog"
   Projects: "projects"
 
