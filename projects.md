@@ -1,3 +1,9 @@
+---
+layout: page
+title: Projects
+use-site-title: false
+---
+
 # Projects
 
 ## Data Science
