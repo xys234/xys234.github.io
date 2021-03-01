@@ -13,4 +13,4 @@ My name is Weihao Yin. Here are are few things about me:
 **Hobbies**: Soccer (A Real Madrid Fan!!). test fkag
 
 [AECOM]: https://aecom.com/
-[proj-research]: /projects.md
+[proj-research]: /projects
