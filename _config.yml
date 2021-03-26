@@ -144,6 +144,13 @@ disqus: "xys234-github-io"
 # Truncates the excerpt to the specified number of words on the index page
 excerpt_length: 50
 
+# Whether or not to show an excerpt for every blog post in the feed page
+feed_show_excerpt: true
+
+# Whether or not to show a list of tags below each post preview in the feed page
+feed_show_tags: true
+
+
 # Character used to separate site title and description in HTML document title
 # and RSS feed title
 title-separator: "-"
