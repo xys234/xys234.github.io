@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Lessons Learned with Spark External Table - Weihao Yin</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="/lessons-learned-with-spark-external-table.html">
+
+        <meta name="author" content="Weihao Yin" />
+        <meta name="keywords" content="data-engineering" />
+        <meta name="description" content="This post discusses a few lessons I learned while working with external tables in Spark. What is an External Table? An external table is created when you define a table from files on disk. It is also called unmanaged table. Spark only manages the metadata about the external table. On …" />
+
+        <meta property="og:site_name" content="Weihao Yin" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Lessons Learned with Spark External Table"/>
+        <meta property="og:url" content="/lessons-learned-with-spark-external-table.html"/>
+        <meta property="og:description" content="This post discusses a few lessons I learned while working with external tables in Spark. What is an External Table? An external table is created when you define a table from files on disk. It is also called unmanaged table. Spark only manages the metadata about the external table. On …"/>
+        <meta property="article:published_time" content="2021-07-01" />
+            <meta property="article:section" content="Writing" />
+            <meta property="article:tag" content="data-engineering" />
+            <meta property="article:author" content="Weihao Yin" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+        <link rel="stylesheet" href="/theme/css/custom.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Weihao Yin ATOM Feed"/>
+
+        <link href="/feeds/writing.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Weihao Yin Writing ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Weihao Yin            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/">About</a></li>
+                    <li><a href="/category/project/">Projects</a></li>
+                    <li><a href="/category/trivia/">Trivia</a></li>
+                        <li class="active">
+                            <a href="/category/writing.html">Writing</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+
+<!-- Banner -->
+<!-- End Banner -->
+
+
+
+<!-- Content Container -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/lessons-learned-with-spark-external-table.html"
+                       rel="bookmark"
+                       title="Permalink to Lessons Learned with Spark External Table">
+                        Lessons Learned with Spark External Table
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2021-07-01T00:00:00-04:00"> Thu 01 July 2021</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/data-engineering.html">data-engineering</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>This post discusses a few lessons I learned while working with external tables in Spark. </p>
+<h2 id="what-is-an-external-table">What is an External Table?</h2>
+<p>An <strong>external table</strong> is created when you define a table from files on disk. It is also called <strong>unmanaged table</strong>. Spark only manages the metadata about the external table. On the other hand, if you use <code>saveAsTable</code> on a <code>DataFrame</code>, you are creating a <strong>managed table</strong> for which spark will track all relevant information including both data and metadata. The actual data is stored to the location specified by the configuration <code>spark.sql.warehouse.dir</code>. The important difference between the two kinds of tables lies with the deletion behavior. When you delete a managed table, the underlying data is also deleted. But for an unmanaged table, only the metadata is deleted while the actual data is intact. </p>
+<h2 id="when-to-use-external-table">When to Use External Table?</h2>
+<p>Sometimes, there is an external data ingestion process that writes data to a cloud storage (e.g., Amazon s3 or Azure ADLS) according to some predefined folder structure, i,e, partition scheme. It may not be efficient to completely copy the data to a different location by creating a managed table while the underlying data might change. An external table is preferred in this situation and it essentially is a link to the actual data and allows partition pruning in spark SQL at the same time. Therefore, a developer does not need to load the data into a <code>DataFrame</code> by using specific paths but uses SQL <code>where</code> clause directly on the table. </p>
+<h2 id="create-an-external-table">Create an External Table</h2>
+<p>Suppose we have a small dataset created as follows. </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span>
+<span class="normal">19</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="kn">import</span> <span class="nn">pandas</span> <span class="k">as</span> <span class="nn">pd</span>
+
+<span class="n">pdf_student</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+<span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;a&#39;</span><span class="p">,</span> <span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;c&#39;</span><span class="p">],</span>
+<span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">,</span><span class="mi">3</span><span class="p">],</span>
+<span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">82</span><span class="p">,</span> <span class="mi">93</span><span class="p">,</span> <span class="mi">77</span><span class="p">]</span>
+<span class="p">})</span>
+
+<span class="n">df_student</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">pdf_student</span><span class="p">)</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+<span class="n">df_student</span>
+<span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+<span class="o">.</span><span class="n">write</span>
+<span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;parquet&#39;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s1">&#39;sid&#39;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s1">&#39;overwrite&#39;</span><span class="p">)</span>
+<span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;/path/to/data/student&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+
+<p>We can create an external table pointing to this dataset. </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">_</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">catalog</span><span class="o">.</span><span class="n">createTable</span><span class="p">(</span>
+  <span class="s1">&#39;dev.student&#39;</span><span class="p">,</span>
+  <span class="n">path</span><span class="o">=</span><span class="s1">&#39;/path/to/data/student&#39;</span><span class="p">,</span> 
+  <span class="n">source</span><span class="o">=</span><span class="s1">&#39;parquet&#39;</span><span class="p">,</span>
+<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+
+<p>If we look at the metadata of table <code>dev.student</code>, we can see that spark does partition discovery and specifies <code>sid</code> as the partition column as expected. </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;DESCRIBE TABLE EXTENDED dev.student;&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+
+<p>Even though the partition structure is created after create the external table, the actual partitions are not recovered. We can run the either of the following 2 commands to let spark recursively read the data and finds all the available partitions. </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;MSCK REPAIR TABLE dev.student;&quot;</span><span class="p">)</span>      
+<span class="n">spark</span><span class="o">.</span><span class="n">sql</span><span class="p">(</span><span class="s2">&quot;ALTER TABLE dev.student RECOVER PARTITIONS;&quot;</span><span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+
+<p><strong>CAUTION</strong>: Both commands list all the files and subfolders under the root path specified in the <code>createTable</code> call. Therefore, it can take some time to run if there are a large number of partitions. In addition, it is important that there is enough driver memory since all the metadata are collected to the driver node. </p>
+<h2 id="update-an-external-table-with-new-data">Update an External Table with New Data</h2>
+<p>This is where things get tricky. </p>
+<p>If we need to write new data to the source location of the table, there are several options. </p>
+<p>First, there is <code>mode='append'</code>. This option will <strong>append the data to existing partitions</strong> and add new partition if necessary.  </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">pdf_student2</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;b&#39;</span><span class="p">,</span> <span class="s1">&#39;d&#39;</span><span class="p">,</span> <span class="s1">&#39;e&#39;</span><span class="p">],</span>
+  <span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">2</span><span class="p">,</span><span class="mi">4</span><span class="p">,</span><span class="mi">5</span><span class="p">],</span>
+  <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">63</span><span class="p">,</span> <span class="mi">72</span><span class="p">,</span> <span class="mi">100</span><span class="p">]</span>
+<span class="p">})</span>
+<span class="n">df_student2</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">pdf_student2</span><span class="p">)</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">df_student2</span>
+  <span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">write</span>
+  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;parquet&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s1">&#39;sid&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s1">&#39;append&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;path/to/data/student&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+
+<p>The data in <code>student2</code> is appended to the existing data. </p>
+<style scoped>
+  .table-result-container {
+    max-height: 300px;
+    overflow: auto;
+  }
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 5px;
+  }
+  th {
+    text-align: left;
+  }
+</style>
+<div class='table-result-container'><table class='table-result'><thead style='background-color: grey'><tr><th>name</th><th>score</th><th>sid</th></tr></thead><tbody><tr><td>a</td><td>82</td><td>1</td></tr><tr><td>b</td><td>63</td><td>2</td></tr><tr><td>b</td><td>93</td><td>2</td></tr><tr><td>c</td><td>77</td><td>3</td></tr><tr><td>d</td><td>72</td><td>4</td></tr><tr><td>e</td><td>100</td><td>5</td></tr></tbody></table></div>
+
+<p>;  </p>
+<p>We can see that another student with <code>sid = 2</code> is appended.  </p>
+<p>Second option is <code>mode='overwrite'</code> with the config <code>spark.conf.get("spark.sql.sources.partitionOverwriteMode") = STATIC</code>. This config is set by default for a spark session. This would overwrite the entire file.   </p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">df_student2</span>
+  <span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">write</span>
+  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;parquet&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s1">&#39;sid&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s1">&#39;overwrite&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;path/to/data/student&#39;</span><span class="p">)</span>
+
+<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+
+<style scoped>
+  .table-result-container {
+    max-height: 300px;
+    overflow: auto;
+  }
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 5px;
+  }
+  th {
+    text-align: left;
+  }
+</style>
+<div class='table-result-container'><table class='table-result'><thead style='background-color: grey'><tr><th>name</th><th>score</th><th>sid</th></tr></thead><tbody><tr><td>b</td><td>63</td><td>2</td></tr><tr><td>d</td><td>72</td><td>4</td></tr><tr><td>e</td><td>100</td><td>5</td></tr></tbody></table></div>
+<p>;    </p>
+<p>Only data in the new <code>df_student2</code> is present. The old data is completely overwritten even for partitions that are not present in <code>df_student2</code>.</p>
+<p>The third option is <code>mode='overwrite'</code> with <code>spark.conf.get("spark.sql.sources.partitionOverwriteMode") = DYNAMIC</code>. This would overwrite <strong>existing partition</strong> and add new partitions.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span>
+<span class="normal">6</span>
+<span class="normal">7</span>
+<span class="normal">8</span>
+<span class="normal">9</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">df_student2</span>
+  <span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">write</span>
+  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;parquet&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s1">&#39;sid&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s1">&#39;overwrite&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;path/to/data/student&#39;</span><span class="p">)</span>
+<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+
+<style scoped>
+  .table-result-container {
+    max-height: 300px;
+    overflow: auto;
+  }
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 5px;
+  }
+  th {
+    text-align: left;
+  }
+</style>
+<div class='table-result-container'><table class='table-result'><thead style='background-color: grey'><tr><th>name</th><th>score</th><th>sid</th></tr></thead><tbody><tr><td>a</td><td>82</td><td>1</td></tr><tr><td>b</td><td>63</td><td>2</td></tr><tr><td>c</td><td>77</td><td>3</td></tr><tr><td>d</td><td>72</td><td>4</td></tr><tr><td>e</td><td>100</td><td>5</td></tr></tbody></table></div>
+<p>;  </p>
+<p>We can also add new partitions explicitly. This option is better suited for new data.</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal"> 1</span>
+<span class="normal"> 2</span>
+<span class="normal"> 3</span>
+<span class="normal"> 4</span>
+<span class="normal"> 5</span>
+<span class="normal"> 6</span>
+<span class="normal"> 7</span>
+<span class="normal"> 8</span>
+<span class="normal"> 9</span>
+<span class="normal">10</span>
+<span class="normal">11</span>
+<span class="normal">12</span>
+<span class="normal">13</span>
+<span class="normal">14</span>
+<span class="normal">15</span>
+<span class="normal">16</span>
+<span class="normal">17</span>
+<span class="normal">18</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="n">pdf_student3</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span>
+  <span class="s1">&#39;name&#39;</span><span class="p">:</span> <span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">,</span> <span class="s1">&#39;y&#39;</span><span class="p">],</span>
+  <span class="s1">&#39;sid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span><span class="mi">7</span><span class="p">],</span>
+  <span class="s1">&#39;score&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">88</span><span class="p">,</span> <span class="mi">99</span><span class="p">]</span>
+<span class="p">})</span>
+
+<span class="n">df_student3</span> <span class="o">=</span> <span class="n">spark</span><span class="o">.</span><span class="n">createDataFrame</span><span class="p">(</span><span class="n">pdf_student3</span><span class="p">)</span>
+
+<span class="n">_</span> <span class="o">=</span> <span class="p">(</span>
+  <span class="n">df_student3</span>
+  <span class="o">.</span><span class="n">coalesce</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">write</span>
+  <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="s1">&#39;parquet&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">partitionBy</span><span class="p">(</span><span class="s1">&#39;sid&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">mode</span><span class="p">(</span><span class="s1">&#39;append&#39;</span><span class="p">)</span>
+  <span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s1">&#39;path/to/data/student&#39;</span><span class="p">)</span>
+
+<span class="p">)</span>
+</code></pre></div></td></tr></table></div>
+
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span></pre></div></td><td class="code"><div><pre><span></span><code><span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">dev</span><span class="p">.</span><span class="n">student</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="n">PARTITION</span><span class="w"> </span><span class="p">(</span><span class="n">sid</span><span class="o">=</span><span class="s1">&#39;6&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">location</span><span class="w"> </span><span class="s1">&#39;path/to/data/student/sid=6&#39;</span><span class="p">;</span>
+<span class="k">ALTER</span><span class="w"> </span><span class="k">TABLE</span><span class="w"> </span><span class="n">dev</span><span class="p">.</span><span class="n">student</span><span class="w"> </span><span class="k">ADD</span><span class="w"> </span><span class="n">PARTITION</span><span class="w"> </span><span class="p">(</span><span class="n">sid</span><span class="o">=</span><span class="s1">&#39;7&#39;</span><span class="p">)</span><span class="w"> </span><span class="k">location</span><span class="w"> </span><span class="s1">&#39;path/to/data/student/sid=7&#39;</span><span class="p">;</span>
+</code></pre></div></td></tr></table></div>
+
+<h3 id="another-syntax-with-insertinto">Another syntax with <code>InsertInto</code></h3>
+<p>Similar behavior can be realized by using <code>insertInto</code> with a spark table with the config change</p>
+<div class="highlight"><table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span>
+<span class="normal">4</span>
+<span class="normal">5</span></pre></div></td><td class="code"><div><pre><span></span><code>insertInto(tableName, overwrite=None)
+
+Inserts the content of the DataFrame to the specified table.
+It requires that the schema of the DataFrame is the same as the schema of the table.
+Optionally overwriting any existing data.
+</code></pre></div></td></tr></table></div>
+
+<p><strong>CAUTION</strong>: <code>InsertInto</code> inserts data by column position. If 2nd column is <code>score</code>, it would be treated as <code>sid</code> similar to the difference between <code>union</code> vs <code>unionByName</code>. Therefore, the columnn ordering needs to be carefully maintained.</p>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'xys234-github-io'; // required: replace example with your forum shortname
+
+            var disqus_config = function () {
+                this.language = "en";
+
+                        this.page.identifier = '2021-07-01-lessons-learned-with-spark-external-table';
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<!-- End Content Container -->
+
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2024 - 2024 Weihao Yin
+            <!-- &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>, -->
+            <!-- <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a> -->         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        tags: 'ams', // Enable numbering for AMS environments like 'equation'
+        // tags: 'all', // Use this instead to number all displayed equations
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+      },
+      loader: {
+        load: ['[tex]/ams'] // Ensure the 'ams' extension is loaded
+      }
+    };
+</script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'xys234-github-io'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+
+
+</body>
+</html>

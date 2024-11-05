@@ -1,0 +1,573 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom"><title>Weihao Yin</title><link href="/" rel="alternate"></link><link href="/feeds/all.atom.xml" rel="self"></link><id>/</id><updated>2024-09-15T00:00:00-04:00</updated><entry><title>Causal Inference Basics</title><link href="/causal-inference-basics.html" rel="alternate"></link><published>2024-09-15T00:00:00-04:00</published><updated>2024-09-15T00:00:00-04:00</updated><author><name>Weihao Yin</name></author><id>tag:None,2024-09-15:/causal-inference-basics.html</id><summary type="html">&lt;p&gt;Without explicitly stating otherwise, we consider binary treatment. &lt;/p&gt;
+&lt;h2 id="1-potential-outcomes"&gt;1. Potential Outcomes&lt;/h2&gt;
+&lt;p&gt;In the Rubin-Neyman potential outcome (PO) framework, the potential outcome &lt;span class="math"&gt;\(Y(t)\)&lt;/span&gt; denotes what subject &lt;span class="math"&gt;\(i\)&lt;/span&gt;’s outcome would be if he were to take treatment &lt;span class="math"&gt;\(t\)&lt;/span&gt;. For example, if the treatment is dichotomous such as getting a heart …&lt;/p&gt;</summary><content type="html">&lt;p&gt;Without explicitly stating otherwise, we consider binary treatment. &lt;/p&gt;
+&lt;h2 id="1-potential-outcomes"&gt;1. Potential Outcomes&lt;/h2&gt;
+&lt;p&gt;In the Rubin-Neyman potential outcome (PO) framework, the potential outcome &lt;span class="math"&gt;\(Y(t)\)&lt;/span&gt; denotes what subject &lt;span class="math"&gt;\(i\)&lt;/span&gt;’s outcome would be if he were to take treatment &lt;span class="math"&gt;\(t\)&lt;/span&gt;. For example, if the treatment is dichotomous such as getting a heart surgery, then a subject could either receive the treatment (&lt;span class="math"&gt;\(t_i = 1\)&lt;/span&gt;) or does not receive the treatment (&lt;span class="math"&gt;\(t_i = 1\)&lt;/span&gt;). &lt;span class="math"&gt;\(Y(1)\)&lt;/span&gt; denotes the outcome with the treatment and &lt;span class="math"&gt;\(Y(0)\)&lt;/span&gt; the outcome without the treatment. We use &lt;span class="math"&gt;\(Y\)&lt;/span&gt; to denote the observed outcome (a.k.a, the factual outcome). Note that there are no counterfactuals or factual until the outcome is observed. Before that, there are only potential outcomes. &lt;/p&gt;
+&lt;p&gt;The individual treatment effect (&lt;strong&gt;ITE&lt;/strong&gt;) is defined in Eq.(1), which is also known as individual causal effect or unit-level causal effect. &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation} \tau_i \triangleq Y_i(1) - Y_i(0) \end{equation}&lt;/div&gt;
+&lt;p&gt;If we use &lt;span class="math"&gt;\(X\)&lt;/span&gt; to denote the covariates and &lt;span class="math"&gt;\(T\)&lt;/span&gt; the random variable that corresponds to the treatment observed, then we usually have the observational data sample &lt;span class="math"&gt;\(\mathcal{D}= \lbrace{({Y_i, X_i, T_i})}\rbrace_{i=1}^n\)&lt;/span&gt; with &lt;span class="math"&gt;\(({Y_i, X_i, T_i}) \stackrel{i.i.d}{\sim} \mathbb{P}\)&lt;/span&gt;. &lt;/p&gt;
+&lt;h2 id="11-the-fundamental-problem-of-causal-inference"&gt;1.1 The Fundamental Problem of Causal Inference&lt;/h2&gt;
+&lt;p&gt;We can only observe one outcome for a given individual, i.e. only &lt;span class="math"&gt;\(Y_i({1})\)&lt;/span&gt; or &lt;span class="math"&gt;\(Y_i({0})\)&lt;/span&gt; can be observed. The unobserved outcome is known as the “counterfactual outcome”. Due to this fundamental problem, the ITE defined in Eq.(1) is simply unobservable. If we take the average over the ITEs for all the individuals, we have average treatment effect (&lt;strong&gt;ATE&lt;/strong&gt;) defined in Eq.(2). &lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\tau=\mathbb{E}\lbrack{Y({1})} - Y({0})\rbrack
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;We use &lt;span class="math"&gt;\(X\)&lt;/span&gt; to denote the covariates for an individual. We can then define the conditional average treatment effect (&lt;strong&gt;CATE&lt;/strong&gt;) as Eq.(3). &lt;/p&gt;
+&lt;div class="math"&gt;$$
+\begin{equation}
+\tau({x})=\mathbb{E}\lbrack{Y({1})} - Y({0})\mid{X=x}\rbrack
+\end{equation}
+$$&lt;/div&gt;
+&lt;p&gt;Another interesting estimand is &lt;strong&gt;Average Treatment Effect on the Treated (ATT)&lt;/strong&gt;: The ATT, on the other hand, is the average effect of the treatment specifically on those who actually received the treatment. It measures the average difference in outcomes for the treated individuals compared to what would have happened if the same individuals had not received the treatment. Mathematically, it is expressed as &lt;/p&gt;
+&lt;div class="math"&gt;$$
+ATT = \mathbb{E}\lbrack{Y({1})} - Y({0})\mid{T=1}\rbrack
+$$&lt;/div&gt;
+&lt;p&gt;The &lt;strong&gt;ATE&lt;/strong&gt;, which is the average effect across the entire population, will be the same as the &lt;strong&gt;ATT&lt;/strong&gt; because the treatment effect does not differ between those who were treated and those who were not. Since everyone responds similarly to the treatment, the distinction between the treated and untreated (or the selection into treatment) does not matter in terms of how they respond to the treatment. Thus, the average effect among those who received the treatment (&lt;strong&gt;ATT&lt;/strong&gt;) is representative of the average effect you would expect in the entire population (&lt;strong&gt;ATE&lt;/strong&gt;). If the treatment effect varies based on characteristics such as age, gender, health status, etc., then the &lt;strong&gt;ATE&lt;/strong&gt; and &lt;strong&gt;ATT&lt;/strong&gt; might differ. &lt;/p&gt;
+&lt;p&gt;Investigators should consider the following central question when conceptualizing the target of inference for a specific study—would it be feasible to treat all eligible patients included in the study with the treatment of interest. If the answer to the central question is no, the treatment would not be given to everyone in the eligible population, and only patients with certain characteristics who actually received the treatment would be ideal candidates for treatment; then the target of inference might be defined as average treatment effect among the treated population (&lt;strong&gt;ATT&lt;/strong&gt;). &lt;/p&gt;
+&lt;h2 id="12-identification-assumptions"&gt;1.2 Identification Assumptions&lt;/h2&gt;
+&lt;p&gt;A causal quantity (e.g. &lt;span class="math"&gt;\(\mathbb{E}\lbrack{Y({t})}\rbrack\)&lt;/span&gt;) is identifiable if we can compute it from a purely statistical quantity such as &lt;span class="math"&gt;\(\mathbb{E}\lbrack{Y\vert{t}}\rbrack\)&lt;/span&gt;. &lt;/p&gt;
+&lt;h3 id="121-exchangeability"&gt;1.2.1 Exchangeability&lt;/h3&gt;
+&lt;p&gt;The intuition behind exchangeability is that we want to ensure the treatment and control groups are comparable. They are the same in all relevant aspects other than the treatment so that we know any difference in the outcome is attributed to the treatment. This intuition is what underlies the concept of “controlling for” or “adjusting for” variables. Mathematically, exchangeability is expressed as Eq.(4). &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+({Y({1}), Y({0}}))\perp{T}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;The exchangeability assumption states that the underlying probability for an outcome when receiving the treatment &lt;span class="math"&gt;\(T\)&lt;/span&gt; is identical among the two groups and the risk is equal to the marginal risk in the whole population. In other words, the control group would show the same risk if they had received the treatment as the treatment group. The counterfactual outcome &lt;span class="math"&gt;\(Y({t})\)&lt;/span&gt; like one’s genetic make-up can be thought of as a fixed characteristic of a person existing before the treatment is randomly assigned. &lt;span class="math"&gt;\(Y({t})\)&lt;/span&gt; encodes what would have been one’s outcome if assigned treatment &lt;span class="math"&gt;\(t\)&lt;/span&gt; and thus does not depend on the treatment you later receive.  Moreover, independence between the counterfactual outcome and the observed treatment does not imply independence between the observed outcome and observed treatment. &lt;/p&gt;
+&lt;p&gt;Exchangeability holds in a randomized experiment but not in an observational dataset. However, if we control for relevant variables by conditioning, maybe the subgroups will be exchangeable. This is known as conditional exchangeability or unconfoundedness as expressed in Eq.(5). &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+({Y({1}), Y({0}}))\perp{T}\mid{X}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;Conditional exchangeability is the main assumption necessary for causal inference. We can identify causal effect within the levels of &lt;span class="math"&gt;\(X\)&lt;/span&gt;. &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\begin{split}   
+\mathbb{E}\lbrack{Y({1})} - Y({0})\mid{X}\rbrack&amp;amp;=\mathbb{E}\lbrack{Y({1})}\mid{X}\rbrack-\mathbb{E}\lbrack{Y({0})}\mid{X}\rbrack\\
+      &amp;amp;=\mathbb{E}\lbrack{Y({1})}\mid{T=1,X}\rbrack-\mathbb{E}\lbrack{Y({0})}\mid{T=0,X}\rbrack \\
+&amp;amp;=\mathbb{E}\lbrack{Y}\mid{T=1,X}\rbrack-\mathbb{E}\lbrack{Y}\mid{T=0,X}\rbrack
+\end{split}
+\end{equation}&lt;/div&gt;
+&lt;h3 id="122-positivityoverlap"&gt;1.2.2 Positivity/Overlap&lt;/h3&gt;
+&lt;p&gt;For all values for covariates &lt;span class="math"&gt;\(x\)&lt;/span&gt; present in the population,&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}0 &amp;lt;P({T=1\mid{X=x}}) &amp;lt; 1\end{equation}&lt;/div&gt;
+&lt;p&gt;If we have positivity violation, then in Eq.(6), we would condition on zero-probability event. Intuitively, positivity violation means that for some subgroup of the population, everyone always receive the treatment or always receives the control. Then, it wouldn’t be possible to estimate the causal effect for this subgroup since we only see either treatment or control. &lt;/p&gt;
+&lt;p&gt;We want the covariate distribution of the treatment group to overlap with the covariate distribution of the control group. This means that for any given set of covariate values, it's possible to find individuals who received the treatment and others who did not, allowing for a meaningful comparison between treated and untreated individuals. Mathematically, we want &lt;span class="math"&gt;\(P({X\mid{T=1}})\)&lt;/span&gt; and &lt;span class="math"&gt;\(P({X\mid{T=0}})\)&lt;/span&gt; (Note these two are conditional distribution instead of a real-valued probability) to have the same support, which is why common support is another alias for positivity. &lt;/p&gt;
+&lt;p&gt;In practice, assessing the overlap assumption involves examining the distribution of propensity scores or covariates across treatment and control groups. Graphical methods, such as plotting the density or cumulative distribution of propensity scores for each group, can help visualize the extent of overlap. Lack of overlap indicates regions where causal inference may be unreliable. Remember positivity is only required for the variables that are required for exchangeability. &lt;/p&gt;
+&lt;h3 id="123-consistency"&gt;1.2.3 Consistency&lt;/h3&gt;
+&lt;p&gt;If the treatment is &lt;span class="math"&gt;\(T\)&lt;/span&gt;, then the observed outcome &lt;span class="math"&gt;\(Y\)&lt;/span&gt; is the potential outcome under treatment &lt;span class="math"&gt;\(T\)&lt;/span&gt;.  &lt;span class="math"&gt;\(T=t \implies Y=Y({t})\)&lt;/span&gt;.&lt;/p&gt;
+&lt;p&gt;Consistency assumption has two components:&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;A precise definition of the treatment.&lt;/li&gt;
+&lt;li&gt;The linkage between counterfactual outcomes to the observed outcomes. &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The first component deals with the issue of “multiple versions of the treatment”. Consider the following examples. &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;If we want to study the heart transplant &lt;span class="math"&gt;\(T\)&lt;/span&gt; on 5-year mortality &lt;span class="math"&gt;\(Y\)&lt;/span&gt;. The experiment protocol may want to specify the the details of other procedures such as anesthesia, surgical technique and post-operative care. Without these details, it is possible that each doctor had conducted a different version of “heart transplant” with her preferred surgical technique. If different surgical techniques have different causal effect on mortality, then the causal effect is not well-defined.&lt;/li&gt;
+&lt;li&gt;In observation studies about interventions that do not correspond well to treatment in the real-world, the problem may be even greater. For example, if the intervention is “exercise” and the outcome is “obesity”, we may want to define the duration, frequency, and type of exercise. Additionally, we also want to specify how the time devoted to exercise would otherwise be spent. If the time goes to playing basketball with the children, then the control group may achieve the same weight loss.&lt;/li&gt;
+&lt;li&gt;If we want to investigate the effect of “obesity” on death, there are many ways to get to the state of obesity and each of them may have different causal effect on death. For example, the obesity due to genetic deficiency may pose greater risk than lack of exercise.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;See the “What if” book Section 3.4 for the discussion on the second component. &lt;/p&gt;
+&lt;h3 id="124-no-interference"&gt;1.2.4 No Interference&lt;/h3&gt;
+&lt;p&gt;No interference means that an individual’s outcome is unaffected by anyone else’s treatment. The outcome is only the function of the individual’s own treatment. This assumption could be violated in a social network setting. For example, if the treatment is a feature that enables easy chatting and the outcome is the online time for the chat app, the friends of the individual who receives the treatment could also increase their in-app time. &lt;/p&gt;
+&lt;h2 id="13-adjustment-formula"&gt;1.3 Adjustment Formula&lt;/h2&gt;
+&lt;p&gt;Adjustment formula estimates the ATE as follows. &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\begin{split}   
+\mathbb{E}\lbrack{Y({1})}-Y({0})\rbrack &amp;amp;= \\  
+&amp;amp;= \mathbb{E}\lbrack{Y({1}})\rbrack - \mathbb{E}\lbrack{Y({0}})\rbrack \enspace \small{\text{(linearity of expectation)}}\\
+&amp;amp;= \mathbb{E}_\mathbb{X}\lbrace\mathbb{E}\lbrack{Y({1}})\mid{X}\rbrack-\mathbb{E}\lbrack{Y({0}})\mid{X}\rbrack\rbrace \enspace \small{\text{(law of iterated expectation)}} \\ 
+&amp;amp;= \mathbb{E}_\mathbb{X}\lbrace\mathbb{E}\lbrack{Y({1}})\mid{T=1, X}\rbrack-\mathbb{E}\lbrack{Y({0}})\mid{T=0, X}\rbrack\rbrace \enspace \small{\text{(unconfoundedness and positivity)}} \\ 
+&amp;amp;= \mathbb{E}_\mathbb{X}\lbrace\mathbb{E}\lbrack{Y}\mid{T=1, X}\rbrack-\mathbb{E}\lbrack{Y}\mid{T=0, X}\rbrack\rbrace \enspace \small{\text{(consistency)}} \\
+\end{split}
+\end{equation}&lt;/div&gt;
+&lt;p&gt;Usually, the conditional expectations are replaced by an ML model. &lt;/p&gt;
+&lt;h2 id="2-randomized-experiment"&gt;2.  Randomized Experiment&lt;/h2&gt;
+&lt;p&gt;We consider two designs.&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;strong&gt;Marginally randomized experiments&lt;/strong&gt;. A single unconditional (marginal) randomization probability that is common to all individuals. For example, we flip a coin to decide the treatment assignment for each individual in the population.&lt;/li&gt;
+&lt;li&gt;&lt;strong&gt;Conditionally randomized experiment&lt;/strong&gt;. We use different randomization probabilities for different levels of discrete variable &lt;span class="math"&gt;\(L\)&lt;/span&gt;. It can be considered as the combination of two marginally randomized experiment if &lt;span class="math"&gt;\(L\)&lt;/span&gt; is dichotomous. Conditionally randomized experiment guarantees conditional exchangeability. In this design, we say there is &lt;em&gt;effect modification&lt;/em&gt; by &lt;span class="math"&gt;\(L\)&lt;/span&gt; or that &lt;em&gt;treatment effect heterogeneity&lt;/em&gt; exists across levels of &lt;span class="math"&gt;\(L\)&lt;/span&gt;.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Marginally randomized experiments produce covariate balance, which is the covariate distribution is the same across treatment groups. Covariate balance implies that &lt;span class="math"&gt;\(X\)&lt;/span&gt; and &lt;span class="math"&gt;\(T\)&lt;/span&gt; are independent. Further more, &lt;em&gt;under covariate balance, association is causation&lt;/em&gt;, &lt;span class="math"&gt;\(\text{Pr}({y\mid{\text{do}(t)}})=\text{Pr}({y\mid{t}})\)&lt;/span&gt;. This is also some of the deep learning based causal inference models attempt to achieve covariate balance in the transformed space using representation learning and then estimate the causal effect.  &lt;/p&gt;
+&lt;p&gt;There are two ways for estimating ATE for conditionally randomized experiment design, namely &lt;strong&gt;standardization&lt;/strong&gt; and &lt;strong&gt;inverse probability weighting (IPW)&lt;/strong&gt;. Standardization is the name in epidemiology and it is also known as S-learner. &lt;/p&gt;
+&lt;h3 id="21-standardization"&gt;2.1 Standardization&lt;/h3&gt;
+&lt;p&gt;Under conditional exchangeability, positivity, and consistency, the standardized mean for treatment level &lt;span class="math"&gt;\(T=t\)&lt;/span&gt; as &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\begin{split} 
+\mathbb{E}\lbrack{Y({t})}\rbrack \\ 
+&amp;amp;= \sum_{l}\mathbb{E}\lbrack{Y({t})\mid{L=l}}\rbrack \text{Pr}\lbrack{L=l}\rbrack \\
+&amp;amp;= \sum_{l}\mathbb{E}\lbrack{Y({t})\mid{T=t, L=l}}\rbrack \text{Pr}\lbrack{L=l}\rbrack \\
+&amp;amp;= \sum_{l}\mathbb{E}\lbrack{Y\mid{T=t, L=l}}\rbrack \text{Pr}\lbrack{L=l}\rbrack \\
+\end{split}
+\end{equation}&lt;/div&gt;
+&lt;h3 id="22-inverse-probability-weighting-ip"&gt;2.2 Inverse Probability Weighting (IP)&lt;/h3&gt;
+&lt;p&gt;An individual’s IP weight depends on the values of &lt;span class="math"&gt;\(T\)&lt;/span&gt; and &lt;span class="math"&gt;\(L\)&lt;/span&gt;. A treated individual receives weight &lt;span class="math"&gt;\({1}/{\text{Pr}\lbrack{T=1\mid{L=l}}\rbrack}\)&lt;/span&gt; while the untreated receives &lt;span class="math"&gt;\({1}/{\text{Pr}\lbrack{T=0\mid{L=l}}\rbrack}\)&lt;/span&gt;. We can simplify the notation by using the conditional probability density function of &lt;span class="math"&gt;\(T\)&lt;/span&gt; given &lt;span class="math"&gt;\(L\)&lt;/span&gt;, &lt;span class="math"&gt;\(f({T\mid{L}})\)&lt;/span&gt;. The IP weight is &lt;span class="math"&gt;\(W^T=1 / f({T\mid{L}})\)&lt;/span&gt;. These weights create a pseudo-population that is twice as large as the original. In this pseudo-population, &lt;span class="math"&gt;\(L\)&lt;/span&gt; is independent of &lt;span class="math"&gt;\(T\)&lt;/span&gt;. &lt;/p&gt;
+&lt;h3 id="23-relationship-between-ipw-and-standardization"&gt;2.3 Relationship between IPW and Standardization&lt;/h3&gt;
+&lt;p&gt;IPW uses the conditional probability of treatment &lt;span class="math"&gt;\(T\)&lt;/span&gt; given covariate &lt;span class="math"&gt;\(L\)&lt;/span&gt; while standardization uses the marginal probability of &lt;span class="math"&gt;\(L\)&lt;/span&gt; and the conditional probability of the outcome given treatment and &lt;span class="math"&gt;\(L\)&lt;/span&gt;. They are actually equivalent. See Technical Point 2.3 of the What-if book. &lt;/p&gt;
+&lt;h3 id="24-an-example-simpsons-paradox"&gt;2.4 An Example - Simpson’s Paradox&lt;/h3&gt;
+&lt;p&gt;Consider the following experiment data for treating kidney stones. &lt;/p&gt;
+&lt;table&gt;
+&lt;thead&gt;
+&lt;tr&gt;
+&lt;th style="text-align: left;"&gt;Variable&lt;/th&gt;
+&lt;th&gt;Treatment A&lt;/th&gt;
+&lt;th&gt;Treatment B&lt;/th&gt;
+&lt;th&gt;Total&lt;/th&gt;
+&lt;/tr&gt;
+&lt;/thead&gt;
+&lt;tbody&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;Stone size = Small&lt;/td&gt;
+&lt;td&gt;81 / 87 = 0.931&lt;/td&gt;
+&lt;td&gt;234 / 270 = 0.867&lt;/td&gt;
+&lt;td&gt;315 / 357&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;Stone size = Large&lt;/td&gt;
+&lt;td&gt;192 / 263 = 0.730&lt;/td&gt;
+&lt;td&gt;55 / 80 = 0.688&lt;/td&gt;
+&lt;td&gt;247 / 343&lt;/td&gt;
+&lt;/tr&gt;
+&lt;tr&gt;
+&lt;td style="text-align: left;"&gt;Total&lt;/td&gt;
+&lt;td&gt;273 / 350 = 0.78&lt;/td&gt;
+&lt;td&gt;289 / 350 = 0.826&lt;/td&gt;
+&lt;td&gt;562 / 700&lt;/td&gt;
+&lt;/tr&gt;
+&lt;/tbody&gt;
+&lt;/table&gt;
+&lt;p&gt;The overall success rate for treatment A is 0.78 vs the success rate for B is 0.826, which suggests that treatment B is more effective for kidney stone. However, within the two stone sizes, A is superior to B. This contradiction at sub-group level vs the population level is known as Simpson’s paradox. Stone size is the confounding variable. We can use IPW and standardization to get the true counterfactual risks. &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;Standardization.&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\text{Pr}({Y^{A}=1})=0.931\times357/700+0.730\times343/700=0.833\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\text{Pr}({Y^{B}=1})=0.867\times357/700+0.688\times343/700=0.779\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;li&gt;IPW&lt;ul&gt;
+&lt;li&gt;We use the conditional probability of receiving treatment given the stone size to estimate the propensity score.&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\text{Pr}({Y^{A}=1})=\cfrac{81\times\cfrac{357}{87}+192\times\cfrac{343}{263}}{357+343}=0.833\)&lt;/span&gt;&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(\text{Pr}({Y^{B}=1})=\cfrac{234\times\cfrac{357}{270}+55\times\cfrac{343}{80}}{357+343}=0.779\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;We can see the results are identical and Treatment A is actually better than Treatment B. This is because treatment B gets assigned more “easy cases” whose stone sizes are small. We can see that the IPW essentially expands the population for two stone sizes to equal size. Specifically, for the small stone, the pseudo population has 357 people for A and 357 for B. On the other hand, the large stone group has 343 for both treatments. In this way, stone size is no longer a confounding factor for treatment effectiveness.  &lt;/p&gt;
+&lt;h2 id="3-causal-graph"&gt;3. Causal Graph&lt;/h2&gt;
+&lt;h3 id="31-backdoor-adjustment"&gt;3.1 Backdoor Adjustment&lt;/h3&gt;
+&lt;p&gt;The most common causal graph is the following one. &lt;/p&gt;
+&lt;p&gt;&lt;a href="https://lucid.app/lucidchart/e46f8b0b-a02e-48fd-8ac4-913d3292d8f4/edit?viewport_loc=-102%2C-20%2C2541%2C1272%2C0_0&amp;amp;invitationId=inv_df515617-52a8-40a4-bd7c-4b3463bbd1b3"&gt;https://lucid.app/lucidchart/e46f8b0b-a02e-48fd-8ac4-913d3292d8f4/edit?viewport_loc=-102%2C-20%2C2541%2C1272%2C0_0&amp;amp;invitationId=inv_df515617-52a8-40a4-bd7c-4b3463bbd1b3&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;In this causal graph, association flows along the non-directional path T→X→Y, called the &lt;strong&gt;backdoor path&lt;/strong&gt;, and the directional paths X→Y and T→Y are causal. If we use the backdoor adjustment by conditioning on X, then we would identify the causal effect of T. &lt;/p&gt;
+&lt;p&gt;The backdoor criterion states that a set of variables &lt;span class="math"&gt;\(W\)&lt;/span&gt; satisfies the backdoor criteria relative to &lt;span class="math"&gt;\(T\)&lt;/span&gt; and &lt;span class="math"&gt;\(Y\)&lt;/span&gt; if &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(W\)&lt;/span&gt; blocks all backdoor paths from &lt;span class="math"&gt;\(T\)&lt;/span&gt; to &lt;span class="math"&gt;\(Y\)&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;&lt;span class="math"&gt;\(W\)&lt;/span&gt; does not contain any descendants of &lt;span class="math"&gt;\(T\)&lt;/span&gt;&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;Intuitively, the criterion stem from examining the causal relationship in the following basic building blocks, namely the chain, fork, and collider. &lt;/p&gt;
+&lt;p&gt;&lt;a href="https://lucid.app/lucidchart/e46f8b0b-a02e-48fd-8ac4-913d3292d8f4/edit?viewport_loc=-102%2C-20%2C2541%2C1272%2C0_0&amp;amp;invitationId=inv_df515617-52a8-40a4-bd7c-4b3463bbd1b3"&gt;https://lucid.app/lucidchart/e46f8b0b-a02e-48fd-8ac4-913d3292d8f4/edit?viewport_loc=-102%2C-20%2C2541%2C1272%2C0_0&amp;amp;invitationId=inv_df515617-52a8-40a4-bd7c-4b3463bbd1b3&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;Based on the Bayesian network factorization, we can easily prove that&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;For chain and fork, if we condition on &lt;span class="math"&gt;\(X_2\)&lt;/span&gt;, &lt;span class="math"&gt;\(X_1\)&lt;/span&gt; and &lt;span class="math"&gt;\(X_3\)&lt;/span&gt; is conditionally independent.&lt;/li&gt;
+&lt;li&gt;For collider, if we don’t condition on &lt;span class="math"&gt;\(X_2\)&lt;/span&gt;, &lt;span class="math"&gt;\(X_1\)&lt;/span&gt; and &lt;span class="math"&gt;\(X_3\)&lt;/span&gt; is conditionally independent. Conditioning on a collider may introduce spurious positive or negative association that does not exist for &lt;span class="math"&gt;\(X_1\)&lt;/span&gt; and &lt;span class="math"&gt;\(X_3\)&lt;/span&gt; .&lt;ul&gt;
+&lt;li&gt;Brady Neal’s book discusses the seemingly plausible observation that the “Good-looking men are jerks”: most of the nice men one meets are not very good-looking while most of the good-looking men are jerks. It seems that kindness and looks are negatively associated. There is actually a third important variable: availability. The previous observation is actually conditioned on a collider, namely availability. The looks and kindness are NOT associated in general population. But when we condition on their shared child &lt;span class="math"&gt;\(X_2\)&lt;/span&gt; (availability = Yes) here, they become associated. The association now flows along the path &lt;span class="math"&gt;\(X_3→X_2←X_1\)&lt;/span&gt; despite the fact that it does not when we don’t condition on &lt;span class="math"&gt;\(X_2\)&lt;/span&gt;.&lt;/li&gt;
+&lt;li&gt;Imagine a study aiming to explore the relationship between two variables: the amount of time spent on social media and personal happiness levels. Conventional wisdom and some research suggest these variables might be independent or even negatively correlated in the general population, with excessive social media use potentially linked to lower happiness levels. However, let's introduce a third variable and see how it affects the observed relationship. Public visibility of social media activity, which can be influenced by both the amount of time spent on social media and personal happiness. For example, individuals who spend a lot of time on social media might post more often, and those who are happier might share more positive content, making their activity more visible and engaging. Suppose we conduct a study focusing only on individuals with high public visibility of their social media activity. This selection criteria (the collider) can introduce a spurious positive association between social media usage and happiness. Why? Because the subgroup of users with high visibility likely includes people who are either spending a lot of time on social media (regardless of their happiness level) or are particularly happy (thus sharing more positive content), or both. By conditioning on the collider (public visibility of social media activity), the study might erroneously conclude that higher social media usage is associated with greater personal happiness among the subgroup, even if these variables are independent or negatively correlated in the general population.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="32-front-door-adjustment-todo"&gt;3.2 Front-Door Adjustment (TODO)&lt;/h3&gt;
+&lt;h2 id="4-estimation"&gt;4. Estimation&lt;/h2&gt;
+&lt;p&gt;We have the observational data sample &lt;span class="math"&gt;\(\mathcal{D}= \lbrace{({Y_i, X_i, T_i})}\rbrace_{i=1}^n\)&lt;/span&gt; with &lt;span class="math"&gt;\(({Y_i, X_i, T_i}) \stackrel{i.i.d}{\sim} \mathbb{P}\)&lt;/span&gt;. Under the identification assumptions, namely unconfoundedness, positivity, and consistency, we define the propensity score as the following equation. &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\pi(x)=P(T=1\mid{X=x})
+\end{equation}&lt;/div&gt;
+&lt;p&gt;We also define the conditional outcome as the following equation. &lt;/p&gt;
+&lt;div class="math"&gt;$$\mu_t(x)=\mathbb{E}_{\mathbb{P}}\lbrack{Y\mid{T=t, X=x}}\rbrack$$&lt;/div&gt;
+&lt;p&gt;We assume no parametric form for these parameters and therefore this is a non-parametric estimation problem. The various estimation methods are mainly characterized by two aspects:&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;How the nuisance parameters &lt;span class="math"&gt;\(\eta=(\mu_0(x), \mu_1(x), \pi(x))\)&lt;/span&gt; are estimated: the parametric form, the model used.&lt;/li&gt;
+&lt;li&gt;How to combine/use these estimates.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h3 id="41-plug-in-estimators"&gt;4.1 Plug-in Estimators&lt;/h3&gt;
+&lt;p&gt;The quantities of interests are ATE and CATE and ATT. CATE is also known as individualized average treatment effects (IATEs). Recall we define ATE as follows. &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\mathbb{E}\lbrack{Y({1})}-Y({0})\rbrack = \mathbb{E}_\mathbb{X}\lbrace\mathbb{E}\lbrack{Y}\mid{T=1, X}\rbrack-\mathbb{E}\lbrack{Y}\mid{T=0, X}\rbrack\rbrace 
+\end{equation}&lt;/div&gt;
+&lt;p&gt;We can fit a statistical or machine learning model to estimate the conditional expectation &lt;span class="math"&gt;\(\mathbb{E}\lbrack{Y}\mid{T, X}\rbrack\rbrace\)&lt;/span&gt; and then approximate the outer expectation &lt;span class="math"&gt;\(\mathbb{E}_\mathbb{X}\)&lt;/span&gt; with its emprical mean over &lt;span class="math"&gt;\(n\)&lt;/span&gt; data points. If we use &lt;span class="math"&gt;\(\mu({1, x})\)&lt;/span&gt; and &lt;/p&gt;
+&lt;p&gt;&lt;span class="math"&gt;\(\mu({0, x})\)&lt;/span&gt; to denote the two conditional expectations, we can estimate ATE as&lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\hat{\tau}=\frac{1}{n}\sum_{\substack{i}}\lbrack{\hat{\mu}({1, x_i})-\hat{\mu}({0, x_i})}\rbrack \enspace \small{\text{(ATE)}} 
+\end{equation}&lt;/div&gt;
+&lt;p&gt;To estimate CATE, we can select those observations that have &lt;span class="math"&gt;\(x_i=x\)&lt;/span&gt;. &lt;/p&gt;
+&lt;div class="math"&gt;\begin{equation}
+\hat{\tau}({x})=\frac{1}{n_x}\sum_{\substack{i:x_i=x}}\lbrack{\hat{\mu}({1, x_i})-\hat{\mu}({0, x_i})}\rbrack \enspace \small{\text{(CATE)}} 
+\end{equation}&lt;/div&gt;
+&lt;p&gt;The estimator in Eq.(13) for CATE is likely prone to positivity violation since positivity needs to be satisfied for all levels of &lt;span class="math"&gt;\(X\)&lt;/span&gt;. For the estimators in Eq.(12) and (13), if we use the treatment as a covariate in a single model for the two outcome, then this estimator is called S-estimator since we only fit one model for &lt;span class="math"&gt;\(\mu\)&lt;/span&gt;. Other names are conditional outcome model, standardization, and parametric G-formula. S-learner could bias towards zero since &lt;span class="math"&gt;\(X\)&lt;/span&gt; is usually high-dimensional (See &lt;a href="https://www.notion.so/Metalearners-for-estimating-heterogeneous-treatment-effects-using-machine-learning-d426b40388e04ae3a5afdac4579c8690?pvs=21"&gt;Metalearners for estimating heterogeneous treatment effects using machine learning&lt;/a&gt;). T-learner fits two separate models for values of treatment to ensure that &lt;span class="math"&gt;\(T\)&lt;/span&gt; cannot be ignored. &lt;/p&gt;
+&lt;p&gt;Another estimator called “X-learner” is different from both S-learner and T-learner since it has three steps. &lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;Fit the outcome models as the T-learner.&lt;/li&gt;
+&lt;li&gt;Fit two estimators for IATEs. &lt;/li&gt;
+&lt;li&gt;Combine the two estimators as a weighted average. Propensity score is suggested to work well. &lt;/li&gt;
+&lt;/ol&gt;
+&lt;p&gt;The paper &lt;a href="https://www.notion.so/Nonparametric-Estimation-of-Heterogeneous-Treatment-Effects-From-Theory-to-Learning-Algorithms-0ed9416eb16c457ea93263c9b1bf58d6?pvs=21"&gt;Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms&lt;/a&gt;) suggests that we can directly regress the following pseudo-outcome directly on covariates. The model can be used to directly estimate CATE. &lt;/p&gt;
+&lt;p&gt;\tilde{Y} = W(Y-\hat{\mu}({0, X})+(1-W)(\hat{\mu}({1, X})-Y)&lt;/p&gt;
+&lt;h3 id="42-representation-learning-methods"&gt;4.2 Representation Learning Methods&lt;/h3&gt;
+&lt;p&gt;A variety of deep learning based methods use neural networks to transform the covariates to a representation space where then the nuisance parameters are then modeled. This representation is usually learned by posing the desirable properties for causal inferencing as the constraints on the form of NN objective functions. For example, covariate balance is a desirable property that would give us conditional exchangeability. We therefore can learn a common representation for both outcome or even the treatment assignment. This representation is then shared and would have covariate balance. &lt;/p&gt;
+&lt;h3 id="example-nns-todo"&gt;Example NNs (TODO)&lt;/h3&gt;
+&lt;h3 id="43-tree-based-methods"&gt;4.3 Tree-based Methods&lt;/h3&gt;
+&lt;h3 id="44-methods-for-multi-valued-and-continuous-treatment"&gt;4.4 Methods for Multi-valued and Continuous Treatment&lt;/h3&gt;
+&lt;h4 id="441-generalized-propensity-score"&gt;4.4.1 Generalized Propensity Score&lt;/h4&gt;
+&lt;p&gt;A common method for dealing with multi-valued and continuous treatment is the generalized propensity score. It is developed in &lt;a href="https://www.notion.so/The-propensity-score-with-continuous-treatments-eada4426a0c849088465ee5774655e45?pvs=21"&gt;The propensity score with continuous treatments&lt;/a&gt;. &lt;/p&gt;
+&lt;p&gt;Let &lt;span class="math"&gt;\(r(t, x)\)&lt;/span&gt; be the conditional density of the treatment given the covariates&lt;/p&gt;
+&lt;div class="math"&gt;$$
+r(t, x)=f_{T|X}(t\mid{x})
+$$&lt;/div&gt;
+&lt;p&gt;Then the generalized propensity score is &lt;span class="math"&gt;\(R=r(T, X)\)&lt;/span&gt;&lt;/p&gt;
+&lt;p&gt;We can follow the procedure below to use the GPS. &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;In the first stage, we use a normal distribution for the treatment given the covariates. We may consider more general models such as mixtures of normals, or heteroskedastic normal distributions with the variance being a parametric function of the covariates. We estimate the parameter by maximum likelihood.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math"&gt;$$
+T_i | X_i \sim \mathcal{N}(\beta_0 + \beta' X_i, \sigma^2)
+$$&lt;/div&gt;
+&lt;div class="math"&gt;$$
+\hat{R}_i = \frac{1}{\sqrt{2\pi \sigma^2}} \exp \left( -\frac{1}{2\sigma^2} (T_i - \hat{\beta}_0 - \hat{\beta}' X_i)^2 \right).
+$$&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;In the second stage, we model the conditional expectation of &lt;span class="math"&gt;\(Y_i\)&lt;/span&gt; given &lt;span class="math"&gt;\(T_i\)&lt;/span&gt; and &lt;span class="math"&gt;\(R_i\)&lt;/span&gt; as a flexible function of its two arguments. For example, we can use the following quadratic equation.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math"&gt;$$
+E[Y_i | T_i, R_i] = \alpha_0 + \alpha_1 T_i + \alpha_2 T_i^2 + \alpha_3 R_i + \alpha_4 R_i^2 + \alpha_5 T_i R_i.
+$$&lt;/div&gt;
+&lt;ul&gt;
+&lt;li&gt;Given the estimated parameter in the second stage, we estimate the average potential outcome at treatment level &lt;span class="math"&gt;\(t\)&lt;/span&gt; as&lt;/li&gt;
+&lt;/ul&gt;
+&lt;div class="math"&gt;$$
+\hat{E}[Y(t)] = \frac{1}{N} \sum_{i=1}^{N} \left( \hat{\alpha}_0 + \hat{\alpha}_1 t + \hat{\alpha}_2 t^2 + \hat{\alpha}_3 \hat{r}(t, X_i) + \hat{\alpha}_4 \hat{r}(t, X_i)^2 + \hat{\alpha}_5 t \hat{r}(t, X_i) \right).
+$$&lt;/div&gt;
+&lt;p&gt;Another way of using the GPS is given in What-If book and the method is very similar to applying the regular propensity score to create a pseudo-population. &lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;First step is estimate the stabilized weights as &lt;span class="math"&gt;\(SW^T = f(T)/f(T\mid{X})\)&lt;/span&gt;. We could make parametric assumptions on both densities such as Gaussian distribution.&lt;/li&gt;
+&lt;li&gt;Compute the weights using the estimated densities then fit a weighted regression model for the outcome with covariates.&lt;/li&gt;
+&lt;/ul&gt;
+&lt;script type="text/javascript"&gt;if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width &lt; 768) ? "left" : align;
+        indent = (screen.width &lt; 768) ? "0em" : indent;
+        linebreak = (screen.width &lt; 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+&lt;/script&gt;</content><category term="Writing"></category><category term="statistics"></category></entry><entry><title>Lessons Learned with Spark External Table</title><link href="/lessons-learned-with-spark-external-table.html" rel="alternate"></link><published>2021-07-01T00:00:00-04:00</published><updated>2021-07-01T00:00:00-04:00</updated><author><name>Weihao Yin</name></author><id>tag:None,2021-07-01:/lessons-learned-with-spark-external-table.html</id><summary type="html">&lt;p&gt;This post discusses a few lessons I learned while working with external tables in Spark. &lt;/p&gt;
+&lt;h2 id="what-is-an-external-table"&gt;What is an External Table?&lt;/h2&gt;
+&lt;p&gt;An &lt;strong&gt;external table&lt;/strong&gt; is created when you define a table from files on disk. It is also called &lt;strong&gt;unmanaged table&lt;/strong&gt;. Spark only manages the metadata about the external table. On …&lt;/p&gt;</summary><content type="html">&lt;p&gt;This post discusses a few lessons I learned while working with external tables in Spark. &lt;/p&gt;
+&lt;h2 id="what-is-an-external-table"&gt;What is an External Table?&lt;/h2&gt;
+&lt;p&gt;An &lt;strong&gt;external table&lt;/strong&gt; is created when you define a table from files on disk. It is also called &lt;strong&gt;unmanaged table&lt;/strong&gt;. Spark only manages the metadata about the external table. On the other hand, if you use &lt;code&gt;saveAsTable&lt;/code&gt; on a &lt;code&gt;DataFrame&lt;/code&gt;, you are creating a &lt;strong&gt;managed table&lt;/strong&gt; for which spark will track all relevant information including both data and metadata. The actual data is stored to the location specified by the configuration &lt;code&gt;spark.sql.warehouse.dir&lt;/code&gt;. The important difference between the two kinds of tables lies with the deletion behavior. When you delete a managed table, the underlying data is also deleted. But for an unmanaged table, only the metadata is deleted while the actual data is intact. &lt;/p&gt;
+&lt;h2 id="when-to-use-external-table"&gt;When to Use External Table?&lt;/h2&gt;
+&lt;p&gt;Sometimes, there is an external data ingestion process that writes data to a cloud storage (e.g., Amazon s3 or Azure ADLS) according to some predefined folder structure, i,e, partition scheme. It may not be efficient to completely copy the data to a different location by creating a managed table while the underlying data might change. An external table is preferred in this situation and it essentially is a link to the actual data and allows partition pruning in spark SQL at the same time. Therefore, a developer does not need to load the data into a &lt;code&gt;DataFrame&lt;/code&gt; by using specific paths but uses SQL &lt;code&gt;where&lt;/code&gt; clause directly on the table. &lt;/p&gt;
+&lt;h2 id="create-an-external-table"&gt;Create an External Table&lt;/h2&gt;
+&lt;p&gt;Suppose we have a small dataset created as follows. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt; 1&lt;/span&gt;
+&lt;span class="normal"&gt; 2&lt;/span&gt;
+&lt;span class="normal"&gt; 3&lt;/span&gt;
+&lt;span class="normal"&gt; 4&lt;/span&gt;
+&lt;span class="normal"&gt; 5&lt;/span&gt;
+&lt;span class="normal"&gt; 6&lt;/span&gt;
+&lt;span class="normal"&gt; 7&lt;/span&gt;
+&lt;span class="normal"&gt; 8&lt;/span&gt;
+&lt;span class="normal"&gt; 9&lt;/span&gt;
+&lt;span class="normal"&gt;10&lt;/span&gt;
+&lt;span class="normal"&gt;11&lt;/span&gt;
+&lt;span class="normal"&gt;12&lt;/span&gt;
+&lt;span class="normal"&gt;13&lt;/span&gt;
+&lt;span class="normal"&gt;14&lt;/span&gt;
+&lt;span class="normal"&gt;15&lt;/span&gt;
+&lt;span class="normal"&gt;16&lt;/span&gt;
+&lt;span class="normal"&gt;17&lt;/span&gt;
+&lt;span class="normal"&gt;18&lt;/span&gt;
+&lt;span class="normal"&gt;19&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="kn"&gt;import&lt;/span&gt; &lt;span class="nn"&gt;pandas&lt;/span&gt; &lt;span class="k"&gt;as&lt;/span&gt; &lt;span class="nn"&gt;pd&lt;/span&gt;
+
+&lt;span class="n"&gt;pdf_student&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DataFrame&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+&lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;a&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;b&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;c&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+&lt;span class="s1"&gt;&amp;#39;sid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;3&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+&lt;span class="s1"&gt;&amp;#39;score&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;82&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;93&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;77&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="p"&gt;})&lt;/span&gt;
+
+&lt;span class="n"&gt;df_student&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;spark&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;createDataFrame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pdf_student&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+&lt;span class="n"&gt;df_student&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;coalesce&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;parquet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;partitionBy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;overwrite&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/path/to/data/student&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;p&gt;We can create an external table pointing to this dataset. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt;1&lt;/span&gt;
+&lt;span class="normal"&gt;2&lt;/span&gt;
+&lt;span class="normal"&gt;3&lt;/span&gt;
+&lt;span class="normal"&gt;4&lt;/span&gt;
+&lt;span class="normal"&gt;5&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;spark&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;catalog&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;createTable&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="s1"&gt;&amp;#39;dev.student&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+  &lt;span class="n"&gt;path&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;/path/to/data/student&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; 
+  &lt;span class="n"&gt;source&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;parquet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;p&gt;If we look at the metadata of table &lt;code&gt;dev.student&lt;/code&gt;, we can see that spark does partition discovery and specifies &lt;code&gt;sid&lt;/code&gt; as the partition column as expected. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt;1&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;spark&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;DESCRIBE TABLE EXTENDED dev.student;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;p&gt;Even though the partition structure is created after create the external table, the actual partitions are not recovered. We can run the either of the following 2 commands to let spark recursively read the data and finds all the available partitions. &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt;1&lt;/span&gt;
+&lt;span class="normal"&gt;2&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;spark&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;MSCK REPAIR TABLE dev.student;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;      
+&lt;span class="n"&gt;spark&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;sql&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s2"&gt;&amp;quot;ALTER TABLE dev.student RECOVER PARTITIONS;&amp;quot;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;CAUTION&lt;/strong&gt;: Both commands list all the files and subfolders under the root path specified in the &lt;code&gt;createTable&lt;/code&gt; call. Therefore, it can take some time to run if there are a large number of partitions. In addition, it is important that there is enough driver memory since all the metadata are collected to the driver node. &lt;/p&gt;
+&lt;h2 id="update-an-external-table-with-new-data"&gt;Update an External Table with New Data&lt;/h2&gt;
+&lt;p&gt;This is where things get tricky. &lt;/p&gt;
+&lt;p&gt;If we need to write new data to the source location of the table, there are several options. &lt;/p&gt;
+&lt;p&gt;First, there is &lt;code&gt;mode='append'&lt;/code&gt;. This option will &lt;strong&gt;append the data to existing partitions&lt;/strong&gt; and add new partition if necessary.  &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt; 1&lt;/span&gt;
+&lt;span class="normal"&gt; 2&lt;/span&gt;
+&lt;span class="normal"&gt; 3&lt;/span&gt;
+&lt;span class="normal"&gt; 4&lt;/span&gt;
+&lt;span class="normal"&gt; 5&lt;/span&gt;
+&lt;span class="normal"&gt; 6&lt;/span&gt;
+&lt;span class="normal"&gt; 7&lt;/span&gt;
+&lt;span class="normal"&gt; 8&lt;/span&gt;
+&lt;span class="normal"&gt; 9&lt;/span&gt;
+&lt;span class="normal"&gt;10&lt;/span&gt;
+&lt;span class="normal"&gt;11&lt;/span&gt;
+&lt;span class="normal"&gt;12&lt;/span&gt;
+&lt;span class="normal"&gt;13&lt;/span&gt;
+&lt;span class="normal"&gt;14&lt;/span&gt;
+&lt;span class="normal"&gt;15&lt;/span&gt;
+&lt;span class="normal"&gt;16&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pdf_student2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DataFrame&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+  &lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;b&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;d&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;e&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+  &lt;span class="s1"&gt;&amp;#39;sid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;2&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;4&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;5&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+  &lt;span class="s1"&gt;&amp;#39;score&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;63&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;72&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;100&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="p"&gt;})&lt;/span&gt;
+&lt;span class="n"&gt;df_student2&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;spark&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;createDataFrame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pdf_student2&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;df_student2&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;coalesce&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;parquet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;partitionBy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;append&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;path/to/data/student&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;p&gt;The data in &lt;code&gt;student2&lt;/code&gt; is appended to the existing data. &lt;/p&gt;
+&lt;style scoped&gt;
+  .table-result-container {
+    max-height: 300px;
+    overflow: auto;
+  }
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 5px;
+  }
+  th {
+    text-align: left;
+  }
+&lt;/style&gt;
+&lt;div class='table-result-container'&gt;&lt;table class='table-result'&gt;&lt;thead style='background-color: grey'&gt;&lt;tr&gt;&lt;th&gt;name&lt;/th&gt;&lt;th&gt;score&lt;/th&gt;&lt;th&gt;sid&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;a&lt;/td&gt;&lt;td&gt;82&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;b&lt;/td&gt;&lt;td&gt;63&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;b&lt;/td&gt;&lt;td&gt;93&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;c&lt;/td&gt;&lt;td&gt;77&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;d&lt;/td&gt;&lt;td&gt;72&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;e&lt;/td&gt;&lt;td&gt;100&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;p&gt;;  &lt;/p&gt;
+&lt;p&gt;We can see that another student with &lt;code&gt;sid = 2&lt;/code&gt; is appended.  &lt;/p&gt;
+&lt;p&gt;Second option is &lt;code&gt;mode='overwrite'&lt;/code&gt; with the config &lt;code&gt;spark.conf.get("spark.sql.sources.partitionOverwriteMode") = STATIC&lt;/code&gt;. This config is set by default for a spark session. This would overwrite the entire file.   &lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt; 1&lt;/span&gt;
+&lt;span class="normal"&gt; 2&lt;/span&gt;
+&lt;span class="normal"&gt; 3&lt;/span&gt;
+&lt;span class="normal"&gt; 4&lt;/span&gt;
+&lt;span class="normal"&gt; 5&lt;/span&gt;
+&lt;span class="normal"&gt; 6&lt;/span&gt;
+&lt;span class="normal"&gt; 7&lt;/span&gt;
+&lt;span class="normal"&gt; 8&lt;/span&gt;
+&lt;span class="normal"&gt; 9&lt;/span&gt;
+&lt;span class="normal"&gt;10&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;df_student2&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;coalesce&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;parquet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;partitionBy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;overwrite&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;path/to/data/student&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;style scoped&gt;
+  .table-result-container {
+    max-height: 300px;
+    overflow: auto;
+  }
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 5px;
+  }
+  th {
+    text-align: left;
+  }
+&lt;/style&gt;
+&lt;div class='table-result-container'&gt;&lt;table class='table-result'&gt;&lt;thead style='background-color: grey'&gt;&lt;tr&gt;&lt;th&gt;name&lt;/th&gt;&lt;th&gt;score&lt;/th&gt;&lt;th&gt;sid&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;b&lt;/td&gt;&lt;td&gt;63&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;d&lt;/td&gt;&lt;td&gt;72&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;e&lt;/td&gt;&lt;td&gt;100&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;;    &lt;/p&gt;
+&lt;p&gt;Only data in the new &lt;code&gt;df_student2&lt;/code&gt; is present. The old data is completely overwritten even for partitions that are not present in &lt;code&gt;df_student2&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;The third option is &lt;code&gt;mode='overwrite'&lt;/code&gt; with &lt;code&gt;spark.conf.get("spark.sql.sources.partitionOverwriteMode") = DYNAMIC&lt;/code&gt;. This would overwrite &lt;strong&gt;existing partition&lt;/strong&gt; and add new partitions.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt;1&lt;/span&gt;
+&lt;span class="normal"&gt;2&lt;/span&gt;
+&lt;span class="normal"&gt;3&lt;/span&gt;
+&lt;span class="normal"&gt;4&lt;/span&gt;
+&lt;span class="normal"&gt;5&lt;/span&gt;
+&lt;span class="normal"&gt;6&lt;/span&gt;
+&lt;span class="normal"&gt;7&lt;/span&gt;
+&lt;span class="normal"&gt;8&lt;/span&gt;
+&lt;span class="normal"&gt;9&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;df_student2&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;coalesce&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;parquet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;partitionBy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;overwrite&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;path/to/data/student&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;style scoped&gt;
+  .table-result-container {
+    max-height: 300px;
+    overflow: auto;
+  }
+  table, th, td {
+    border: 1px solid black;
+    border-collapse: collapse;
+  }
+  th, td {
+    padding: 5px;
+  }
+  th {
+    text-align: left;
+  }
+&lt;/style&gt;
+&lt;div class='table-result-container'&gt;&lt;table class='table-result'&gt;&lt;thead style='background-color: grey'&gt;&lt;tr&gt;&lt;th&gt;name&lt;/th&gt;&lt;th&gt;score&lt;/th&gt;&lt;th&gt;sid&lt;/th&gt;&lt;/tr&gt;&lt;/thead&gt;&lt;tbody&gt;&lt;tr&gt;&lt;td&gt;a&lt;/td&gt;&lt;td&gt;82&lt;/td&gt;&lt;td&gt;1&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;b&lt;/td&gt;&lt;td&gt;63&lt;/td&gt;&lt;td&gt;2&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;c&lt;/td&gt;&lt;td&gt;77&lt;/td&gt;&lt;td&gt;3&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;d&lt;/td&gt;&lt;td&gt;72&lt;/td&gt;&lt;td&gt;4&lt;/td&gt;&lt;/tr&gt;&lt;tr&gt;&lt;td&gt;e&lt;/td&gt;&lt;td&gt;100&lt;/td&gt;&lt;td&gt;5&lt;/td&gt;&lt;/tr&gt;&lt;/tbody&gt;&lt;/table&gt;&lt;/div&gt;
+&lt;p&gt;;  &lt;/p&gt;
+&lt;p&gt;We can also add new partitions explicitly. This option is better suited for new data.&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt; 1&lt;/span&gt;
+&lt;span class="normal"&gt; 2&lt;/span&gt;
+&lt;span class="normal"&gt; 3&lt;/span&gt;
+&lt;span class="normal"&gt; 4&lt;/span&gt;
+&lt;span class="normal"&gt; 5&lt;/span&gt;
+&lt;span class="normal"&gt; 6&lt;/span&gt;
+&lt;span class="normal"&gt; 7&lt;/span&gt;
+&lt;span class="normal"&gt; 8&lt;/span&gt;
+&lt;span class="normal"&gt; 9&lt;/span&gt;
+&lt;span class="normal"&gt;10&lt;/span&gt;
+&lt;span class="normal"&gt;11&lt;/span&gt;
+&lt;span class="normal"&gt;12&lt;/span&gt;
+&lt;span class="normal"&gt;13&lt;/span&gt;
+&lt;span class="normal"&gt;14&lt;/span&gt;
+&lt;span class="normal"&gt;15&lt;/span&gt;
+&lt;span class="normal"&gt;16&lt;/span&gt;
+&lt;span class="normal"&gt;17&lt;/span&gt;
+&lt;span class="normal"&gt;18&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="n"&gt;pdf_student3&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;pd&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;DataFrame&lt;/span&gt;&lt;span class="p"&gt;({&lt;/span&gt;
+  &lt;span class="s1"&gt;&amp;#39;name&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;x&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="s1"&gt;&amp;#39;y&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+  &lt;span class="s1"&gt;&amp;#39;sid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;6&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt;&lt;span class="mi"&gt;7&lt;/span&gt;&lt;span class="p"&gt;],&lt;/span&gt;
+  &lt;span class="s1"&gt;&amp;#39;score&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;:&lt;/span&gt; &lt;span class="p"&gt;[&lt;/span&gt;&lt;span class="mi"&gt;88&lt;/span&gt;&lt;span class="p"&gt;,&lt;/span&gt; &lt;span class="mi"&gt;99&lt;/span&gt;&lt;span class="p"&gt;]&lt;/span&gt;
+&lt;span class="p"&gt;})&lt;/span&gt;
+
+&lt;span class="n"&gt;df_student3&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="n"&gt;spark&lt;/span&gt;&lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;createDataFrame&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;pdf_student3&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="n"&gt;_&lt;/span&gt; &lt;span class="o"&gt;=&lt;/span&gt; &lt;span class="p"&gt;(&lt;/span&gt;
+  &lt;span class="n"&gt;df_student3&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;coalesce&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="mi"&gt;1&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;write&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;format&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;parquet&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;partitionBy&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;sid&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;mode&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;append&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+  &lt;span class="o"&gt;.&lt;/span&gt;&lt;span class="n"&gt;save&lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;path/to/data/student&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;
+
+&lt;span class="p"&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt;1&lt;/span&gt;
+&lt;span class="normal"&gt;2&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;&lt;span class="k"&gt;ALTER&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TABLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;student&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ADD&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;6&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;path/to/data/student/sid=6&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;span class="k"&gt;ALTER&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;TABLE&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;dev&lt;/span&gt;&lt;span class="p"&gt;.&lt;/span&gt;&lt;span class="n"&gt;student&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;ADD&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="n"&gt;PARTITION&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="p"&gt;(&lt;/span&gt;&lt;span class="n"&gt;sid&lt;/span&gt;&lt;span class="o"&gt;=&lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;7&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;)&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="k"&gt;location&lt;/span&gt;&lt;span class="w"&gt; &lt;/span&gt;&lt;span class="s1"&gt;&amp;#39;path/to/data/student/sid=7&amp;#39;&lt;/span&gt;&lt;span class="p"&gt;;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;h3 id="another-syntax-with-insertinto"&gt;Another syntax with &lt;code&gt;InsertInto&lt;/code&gt;&lt;/h3&gt;
+&lt;p&gt;Similar behavior can be realized by using &lt;code&gt;insertInto&lt;/code&gt; with a spark table with the config change&lt;/p&gt;
+&lt;div class="highlight"&gt;&lt;table class="highlighttable"&gt;&lt;tr&gt;&lt;td class="linenos"&gt;&lt;div class="linenodiv"&gt;&lt;pre&gt;&lt;span class="normal"&gt;1&lt;/span&gt;
+&lt;span class="normal"&gt;2&lt;/span&gt;
+&lt;span class="normal"&gt;3&lt;/span&gt;
+&lt;span class="normal"&gt;4&lt;/span&gt;
+&lt;span class="normal"&gt;5&lt;/span&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;td class="code"&gt;&lt;div&gt;&lt;pre&gt;&lt;span&gt;&lt;/span&gt;&lt;code&gt;insertInto(tableName, overwrite=None)
+
+Inserts the content of the DataFrame to the specified table.
+It requires that the schema of the DataFrame is the same as the schema of the table.
+Optionally overwriting any existing data.
+&lt;/code&gt;&lt;/pre&gt;&lt;/div&gt;&lt;/td&gt;&lt;/tr&gt;&lt;/table&gt;&lt;/div&gt;
+
+&lt;p&gt;&lt;strong&gt;CAUTION&lt;/strong&gt;: &lt;code&gt;InsertInto&lt;/code&gt; inserts data by column position. If 2nd column is &lt;code&gt;score&lt;/code&gt;, it would be treated as &lt;code&gt;sid&lt;/code&gt; similar to the difference between &lt;code&gt;union&lt;/code&gt; vs &lt;code&gt;unionByName&lt;/code&gt;. Therefore, the columnn ordering needs to be carefully maintained.&lt;/p&gt;</content><category term="Writing"></category><category term="data-engineering"></category></entry></feed>

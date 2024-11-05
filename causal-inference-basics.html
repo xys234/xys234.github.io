@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en" prefix="og: http://ogp.me/ns# fb: https://www.facebook.com/2008/fbml">
+<head>
+    <title>Causal Inference Basics - Weihao Yin</title>
+    <!-- Using the latest rendering mode for IE -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+
+
+<link rel="canonical" href="/causal-inference-basics.html">
+
+        <meta name="author" content="Weihao Yin" />
+        <meta name="keywords" content="statistics" />
+        <meta name="description" content="Without explicitly stating otherwise, we consider binary treatment. 1. Potential Outcomes In the Rubin-Neyman potential outcome (PO) framework, the potential outcome \(Y(t)\) denotes what subject \(i\)’s outcome would be if he were to take treatment \(t\). For example, if the treatment is dichotomous such as getting a heart …" />
+
+        <meta property="og:site_name" content="Weihao Yin" />
+        <meta property="og:type" content="article"/>
+        <meta property="og:title" content="Causal Inference Basics"/>
+        <meta property="og:url" content="/causal-inference-basics.html"/>
+        <meta property="og:description" content="Without explicitly stating otherwise, we consider binary treatment. 1. Potential Outcomes In the Rubin-Neyman potential outcome (PO) framework, the potential outcome \(Y(t)\) denotes what subject \(i\)’s outcome would be if he were to take treatment \(t\). For example, if the treatment is dichotomous such as getting a heart …"/>
+        <meta property="article:published_time" content="2024-09-15" />
+            <meta property="article:section" content="Writing" />
+            <meta property="article:tag" content="statistics" />
+            <meta property="article:author" content="Weihao Yin" />
+
+
+
+    <!-- Bootstrap -->
+        <link rel="stylesheet" href="/theme/css/bootstrap.simplex.min.css" type="text/css"/>
+        <link rel="stylesheet" href="/theme/css/custom.css" type="text/css"/>
+    <link href="/theme/css/font-awesome.min.css" rel="stylesheet">
+
+    <link href="/theme/css/pygments/native.css" rel="stylesheet">
+    <link rel="stylesheet" href="/theme/css/style.css" type="text/css"/>
+
+        <link href="/feeds/all.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Weihao Yin ATOM Feed"/>
+
+        <link href="/feeds/writing.atom.xml" type="application/atom+xml" rel="alternate"
+              title="Weihao Yin Writing ATOM Feed"/>
+
+</head>
+<body>
+
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-ex1-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a href="/" class="navbar-brand">
+Weihao Yin            </a>
+        </div>
+        <div class="collapse navbar-collapse navbar-ex1-collapse">
+            <ul class="nav navbar-nav">
+                    <li><a href="/">About</a></li>
+                    <li><a href="/category/project/">Projects</a></li>
+                    <li><a href="/category/trivia/">Trivia</a></li>
+                        <li class="active">
+                            <a href="/category/writing.html">Writing</a>
+                        </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+            </ul>
+        </div>
+        <!-- /.navbar-collapse -->
+    </div>
+</div> <!-- /.navbar -->
+
+<!-- Banner -->
+<!-- End Banner -->
+
+
+
+<!-- Content Container -->
+<div class="container">
+    <div class="row">
+        <div class="col-lg-12">
+    <section id="content">
+        <article>
+            <header class="page-header">
+                <h1>
+                    <a href="/causal-inference-basics.html"
+                       rel="bookmark"
+                       title="Permalink to Causal Inference Basics">
+                        Causal Inference Basics
+                    </a>
+                </h1>
+            </header>
+            <div class="entry-content">
+                <div class="panel">
+                    <div class="panel-body">
+<footer class="post-info">
+    <span class="label label-default">Date</span>
+    <span class="published">
+        <i class="fa fa-calendar"></i><time datetime="2024-09-15T00:00:00-04:00"> Sun 15 September 2024</time>
+    </span>
+
+
+
+
+
+<span class="label label-default">Tags</span>
+	<a href="/tag/statistics.html">statistics</a>
+    
+</footer><!-- /.post-info -->                    </div>
+                </div>
+                <p>Without explicitly stating otherwise, we consider binary treatment. </p>
+<h2 id="1-potential-outcomes">1. Potential Outcomes</h2>
+<p>In the Rubin-Neyman potential outcome (PO) framework, the potential outcome <span class="math">\(Y(t)\)</span> denotes what subject <span class="math">\(i\)</span>’s outcome would be if he were to take treatment <span class="math">\(t\)</span>. For example, if the treatment is dichotomous such as getting a heart surgery, then a subject could either receive the treatment (<span class="math">\(t_i = 1\)</span>) or does not receive the treatment (<span class="math">\(t_i = 1\)</span>). <span class="math">\(Y(1)\)</span> denotes the outcome with the treatment and <span class="math">\(Y(0)\)</span> the outcome without the treatment. We use <span class="math">\(Y\)</span> to denote the observed outcome (a.k.a, the factual outcome). Note that there are no counterfactuals or factual until the outcome is observed. Before that, there are only potential outcomes. </p>
+<p>The individual treatment effect (<strong>ITE</strong>) is defined in Eq.(1), which is also known as individual causal effect or unit-level causal effect. </p>
+<div class="math">\begin{equation} \tau_i \triangleq Y_i(1) - Y_i(0) \end{equation}</div>
+<p>If we use <span class="math">\(X\)</span> to denote the covariates and <span class="math">\(T\)</span> the random variable that corresponds to the treatment observed, then we usually have the observational data sample <span class="math">\(\mathcal{D}= \lbrace{({Y_i, X_i, T_i})}\rbrace_{i=1}^n\)</span> with <span class="math">\(({Y_i, X_i, T_i}) \stackrel{i.i.d}{\sim} \mathbb{P}\)</span>. </p>
+<h2 id="11-the-fundamental-problem-of-causal-inference">1.1 The Fundamental Problem of Causal Inference</h2>
+<p>We can only observe one outcome for a given individual, i.e. only <span class="math">\(Y_i({1})\)</span> or <span class="math">\(Y_i({0})\)</span> can be observed. The unobserved outcome is known as the “counterfactual outcome”. Due to this fundamental problem, the ITE defined in Eq.(1) is simply unobservable. If we take the average over the ITEs for all the individuals, we have average treatment effect (<strong>ATE</strong>) defined in Eq.(2). </p>
+<div class="math">$$
+\begin{equation}
+\tau=\mathbb{E}\lbrack{Y({1})} - Y({0})\rbrack
+\end{equation}
+$$</div>
+<p>We use <span class="math">\(X\)</span> to denote the covariates for an individual. We can then define the conditional average treatment effect (<strong>CATE</strong>) as Eq.(3). </p>
+<div class="math">$$
+\begin{equation}
+\tau({x})=\mathbb{E}\lbrack{Y({1})} - Y({0})\mid{X=x}\rbrack
+\end{equation}
+$$</div>
+<p>Another interesting estimand is <strong>Average Treatment Effect on the Treated (ATT)</strong>: The ATT, on the other hand, is the average effect of the treatment specifically on those who actually received the treatment. It measures the average difference in outcomes for the treated individuals compared to what would have happened if the same individuals had not received the treatment. Mathematically, it is expressed as </p>
+<div class="math">$$
+ATT = \mathbb{E}\lbrack{Y({1})} - Y({0})\mid{T=1}\rbrack
+$$</div>
+<p>The <strong>ATE</strong>, which is the average effect across the entire population, will be the same as the <strong>ATT</strong> because the treatment effect does not differ between those who were treated and those who were not. Since everyone responds similarly to the treatment, the distinction between the treated and untreated (or the selection into treatment) does not matter in terms of how they respond to the treatment. Thus, the average effect among those who received the treatment (<strong>ATT</strong>) is representative of the average effect you would expect in the entire population (<strong>ATE</strong>). If the treatment effect varies based on characteristics such as age, gender, health status, etc., then the <strong>ATE</strong> and <strong>ATT</strong> might differ. </p>
+<p>Investigators should consider the following central question when conceptualizing the target of inference for a specific study—would it be feasible to treat all eligible patients included in the study with the treatment of interest. If the answer to the central question is no, the treatment would not be given to everyone in the eligible population, and only patients with certain characteristics who actually received the treatment would be ideal candidates for treatment; then the target of inference might be defined as average treatment effect among the treated population (<strong>ATT</strong>). </p>
+<h2 id="12-identification-assumptions">1.2 Identification Assumptions</h2>
+<p>A causal quantity (e.g. <span class="math">\(\mathbb{E}\lbrack{Y({t})}\rbrack\)</span>) is identifiable if we can compute it from a purely statistical quantity such as <span class="math">\(\mathbb{E}\lbrack{Y\vert{t}}\rbrack\)</span>. </p>
+<h3 id="121-exchangeability">1.2.1 Exchangeability</h3>
+<p>The intuition behind exchangeability is that we want to ensure the treatment and control groups are comparable. They are the same in all relevant aspects other than the treatment so that we know any difference in the outcome is attributed to the treatment. This intuition is what underlies the concept of “controlling for” or “adjusting for” variables. Mathematically, exchangeability is expressed as Eq.(4). </p>
+<div class="math">\begin{equation}
+({Y({1}), Y({0}}))\perp{T}
+\end{equation}</div>
+<p>The exchangeability assumption states that the underlying probability for an outcome when receiving the treatment <span class="math">\(T\)</span> is identical among the two groups and the risk is equal to the marginal risk in the whole population. In other words, the control group would show the same risk if they had received the treatment as the treatment group. The counterfactual outcome <span class="math">\(Y({t})\)</span> like one’s genetic make-up can be thought of as a fixed characteristic of a person existing before the treatment is randomly assigned. <span class="math">\(Y({t})\)</span> encodes what would have been one’s outcome if assigned treatment <span class="math">\(t\)</span> and thus does not depend on the treatment you later receive.  Moreover, independence between the counterfactual outcome and the observed treatment does not imply independence between the observed outcome and observed treatment. </p>
+<p>Exchangeability holds in a randomized experiment but not in an observational dataset. However, if we control for relevant variables by conditioning, maybe the subgroups will be exchangeable. This is known as conditional exchangeability or unconfoundedness as expressed in Eq.(5). </p>
+<div class="math">\begin{equation}
+({Y({1}), Y({0}}))\perp{T}\mid{X}
+\end{equation}</div>
+<p>Conditional exchangeability is the main assumption necessary for causal inference. We can identify causal effect within the levels of <span class="math">\(X\)</span>. </p>
+<div class="math">\begin{equation}
+\begin{split}   
+\mathbb{E}\lbrack{Y({1})} - Y({0})\mid{X}\rbrack&amp;=\mathbb{E}\lbrack{Y({1})}\mid{X}\rbrack-\mathbb{E}\lbrack{Y({0})}\mid{X}\rbrack\\
+      &amp;=\mathbb{E}\lbrack{Y({1})}\mid{T=1,X}\rbrack-\mathbb{E}\lbrack{Y({0})}\mid{T=0,X}\rbrack \\
+&amp;=\mathbb{E}\lbrack{Y}\mid{T=1,X}\rbrack-\mathbb{E}\lbrack{Y}\mid{T=0,X}\rbrack
+\end{split}
+\end{equation}</div>
+<h3 id="122-positivityoverlap">1.2.2 Positivity/Overlap</h3>
+<p>For all values for covariates <span class="math">\(x\)</span> present in the population,</p>
+<div class="math">\begin{equation}0 &lt;P({T=1\mid{X=x}}) &lt; 1\end{equation}</div>
+<p>If we have positivity violation, then in Eq.(6), we would condition on zero-probability event. Intuitively, positivity violation means that for some subgroup of the population, everyone always receive the treatment or always receives the control. Then, it wouldn’t be possible to estimate the causal effect for this subgroup since we only see either treatment or control. </p>
+<p>We want the covariate distribution of the treatment group to overlap with the covariate distribution of the control group. This means that for any given set of covariate values, it's possible to find individuals who received the treatment and others who did not, allowing for a meaningful comparison between treated and untreated individuals. Mathematically, we want <span class="math">\(P({X\mid{T=1}})\)</span> and <span class="math">\(P({X\mid{T=0}})\)</span> (Note these two are conditional distribution instead of a real-valued probability) to have the same support, which is why common support is another alias for positivity. </p>
+<p>In practice, assessing the overlap assumption involves examining the distribution of propensity scores or covariates across treatment and control groups. Graphical methods, such as plotting the density or cumulative distribution of propensity scores for each group, can help visualize the extent of overlap. Lack of overlap indicates regions where causal inference may be unreliable. Remember positivity is only required for the variables that are required for exchangeability. </p>
+<h3 id="123-consistency">1.2.3 Consistency</h3>
+<p>If the treatment is <span class="math">\(T\)</span>, then the observed outcome <span class="math">\(Y\)</span> is the potential outcome under treatment <span class="math">\(T\)</span>.  <span class="math">\(T=t \implies Y=Y({t})\)</span>.</p>
+<p>Consistency assumption has two components:</p>
+<ol>
+<li>A precise definition of the treatment.</li>
+<li>The linkage between counterfactual outcomes to the observed outcomes. </li>
+</ol>
+<p>The first component deals with the issue of “multiple versions of the treatment”. Consider the following examples. </p>
+<ul>
+<li>If we want to study the heart transplant <span class="math">\(T\)</span> on 5-year mortality <span class="math">\(Y\)</span>. The experiment protocol may want to specify the the details of other procedures such as anesthesia, surgical technique and post-operative care. Without these details, it is possible that each doctor had conducted a different version of “heart transplant” with her preferred surgical technique. If different surgical techniques have different causal effect on mortality, then the causal effect is not well-defined.</li>
+<li>In observation studies about interventions that do not correspond well to treatment in the real-world, the problem may be even greater. For example, if the intervention is “exercise” and the outcome is “obesity”, we may want to define the duration, frequency, and type of exercise. Additionally, we also want to specify how the time devoted to exercise would otherwise be spent. If the time goes to playing basketball with the children, then the control group may achieve the same weight loss.</li>
+<li>If we want to investigate the effect of “obesity” on death, there are many ways to get to the state of obesity and each of them may have different causal effect on death. For example, the obesity due to genetic deficiency may pose greater risk than lack of exercise.</li>
+</ul>
+<p>See the “What if” book Section 3.4 for the discussion on the second component. </p>
+<h3 id="124-no-interference">1.2.4 No Interference</h3>
+<p>No interference means that an individual’s outcome is unaffected by anyone else’s treatment. The outcome is only the function of the individual’s own treatment. This assumption could be violated in a social network setting. For example, if the treatment is a feature that enables easy chatting and the outcome is the online time for the chat app, the friends of the individual who receives the treatment could also increase their in-app time. </p>
+<h2 id="13-adjustment-formula">1.3 Adjustment Formula</h2>
+<p>Adjustment formula estimates the ATE as follows. </p>
+<div class="math">\begin{equation}
+\begin{split}   
+\mathbb{E}\lbrack{Y({1})}-Y({0})\rbrack &amp;= \\  
+&amp;= \mathbb{E}\lbrack{Y({1}})\rbrack - \mathbb{E}\lbrack{Y({0}})\rbrack \enspace \small{\text{(linearity of expectation)}}\\
+&amp;= \mathbb{E}_\mathbb{X}\lbrace\mathbb{E}\lbrack{Y({1}})\mid{X}\rbrack-\mathbb{E}\lbrack{Y({0}})\mid{X}\rbrack\rbrace \enspace \small{\text{(law of iterated expectation)}} \\ 
+&amp;= \mathbb{E}_\mathbb{X}\lbrace\mathbb{E}\lbrack{Y({1}})\mid{T=1, X}\rbrack-\mathbb{E}\lbrack{Y({0}})\mid{T=0, X}\rbrack\rbrace \enspace \small{\text{(unconfoundedness and positivity)}} \\ 
+&amp;= \mathbb{E}_\mathbb{X}\lbrace\mathbb{E}\lbrack{Y}\mid{T=1, X}\rbrack-\mathbb{E}\lbrack{Y}\mid{T=0, X}\rbrack\rbrace \enspace \small{\text{(consistency)}} \\
+\end{split}
+\end{equation}</div>
+<p>Usually, the conditional expectations are replaced by an ML model. </p>
+<h2 id="2-randomized-experiment">2.  Randomized Experiment</h2>
+<p>We consider two designs.</p>
+<ul>
+<li><strong>Marginally randomized experiments</strong>. A single unconditional (marginal) randomization probability that is common to all individuals. For example, we flip a coin to decide the treatment assignment for each individual in the population.</li>
+<li><strong>Conditionally randomized experiment</strong>. We use different randomization probabilities for different levels of discrete variable <span class="math">\(L\)</span>. It can be considered as the combination of two marginally randomized experiment if <span class="math">\(L\)</span> is dichotomous. Conditionally randomized experiment guarantees conditional exchangeability. In this design, we say there is <em>effect modification</em> by <span class="math">\(L\)</span> or that <em>treatment effect heterogeneity</em> exists across levels of <span class="math">\(L\)</span>.</li>
+</ul>
+<p>Marginally randomized experiments produce covariate balance, which is the covariate distribution is the same across treatment groups. Covariate balance implies that <span class="math">\(X\)</span> and <span class="math">\(T\)</span> are independent. Further more, <em>under covariate balance, association is causation</em>, <span class="math">\(\text{Pr}({y\mid{\text{do}(t)}})=\text{Pr}({y\mid{t}})\)</span>. This is also some of the deep learning based causal inference models attempt to achieve covariate balance in the transformed space using representation learning and then estimate the causal effect.  </p>
+<p>There are two ways for estimating ATE for conditionally randomized experiment design, namely <strong>standardization</strong> and <strong>inverse probability weighting (IPW)</strong>. Standardization is the name in epidemiology and it is also known as S-learner. </p>
+<h3 id="21-standardization">2.1 Standardization</h3>
+<p>Under conditional exchangeability, positivity, and consistency, the standardized mean for treatment level <span class="math">\(T=t\)</span> as </p>
+<div class="math">\begin{equation}
+\begin{split} 
+\mathbb{E}\lbrack{Y({t})}\rbrack \\ 
+&amp;= \sum_{l}\mathbb{E}\lbrack{Y({t})\mid{L=l}}\rbrack \text{Pr}\lbrack{L=l}\rbrack \\
+&amp;= \sum_{l}\mathbb{E}\lbrack{Y({t})\mid{T=t, L=l}}\rbrack \text{Pr}\lbrack{L=l}\rbrack \\
+&amp;= \sum_{l}\mathbb{E}\lbrack{Y\mid{T=t, L=l}}\rbrack \text{Pr}\lbrack{L=l}\rbrack \\
+\end{split}
+\end{equation}</div>
+<h3 id="22-inverse-probability-weighting-ip">2.2 Inverse Probability Weighting (IP)</h3>
+<p>An individual’s IP weight depends on the values of <span class="math">\(T\)</span> and <span class="math">\(L\)</span>. A treated individual receives weight <span class="math">\({1}/{\text{Pr}\lbrack{T=1\mid{L=l}}\rbrack}\)</span> while the untreated receives <span class="math">\({1}/{\text{Pr}\lbrack{T=0\mid{L=l}}\rbrack}\)</span>. We can simplify the notation by using the conditional probability density function of <span class="math">\(T\)</span> given <span class="math">\(L\)</span>, <span class="math">\(f({T\mid{L}})\)</span>. The IP weight is <span class="math">\(W^T=1 / f({T\mid{L}})\)</span>. These weights create a pseudo-population that is twice as large as the original. In this pseudo-population, <span class="math">\(L\)</span> is independent of <span class="math">\(T\)</span>. </p>
+<h3 id="23-relationship-between-ipw-and-standardization">2.3 Relationship between IPW and Standardization</h3>
+<p>IPW uses the conditional probability of treatment <span class="math">\(T\)</span> given covariate <span class="math">\(L\)</span> while standardization uses the marginal probability of <span class="math">\(L\)</span> and the conditional probability of the outcome given treatment and <span class="math">\(L\)</span>. They are actually equivalent. See Technical Point 2.3 of the What-if book. </p>
+<h3 id="24-an-example-simpsons-paradox">2.4 An Example - Simpson’s Paradox</h3>
+<p>Consider the following experiment data for treating kidney stones. </p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Variable</th>
+<th>Treatment A</th>
+<th>Treatment B</th>
+<th>Total</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Stone size = Small</td>
+<td>81 / 87 = 0.931</td>
+<td>234 / 270 = 0.867</td>
+<td>315 / 357</td>
+</tr>
+<tr>
+<td style="text-align: left;">Stone size = Large</td>
+<td>192 / 263 = 0.730</td>
+<td>55 / 80 = 0.688</td>
+<td>247 / 343</td>
+</tr>
+<tr>
+<td style="text-align: left;">Total</td>
+<td>273 / 350 = 0.78</td>
+<td>289 / 350 = 0.826</td>
+<td>562 / 700</td>
+</tr>
+</tbody>
+</table>
+<p>The overall success rate for treatment A is 0.78 vs the success rate for B is 0.826, which suggests that treatment B is more effective for kidney stone. However, within the two stone sizes, A is superior to B. This contradiction at sub-group level vs the population level is known as Simpson’s paradox. Stone size is the confounding variable. We can use IPW and standardization to get the true counterfactual risks. </p>
+<ul>
+<li>Standardization.<ul>
+<li><span class="math">\(\text{Pr}({Y^{A}=1})=0.931\times357/700+0.730\times343/700=0.833\)</span></li>
+<li><span class="math">\(\text{Pr}({Y^{B}=1})=0.867\times357/700+0.688\times343/700=0.779\)</span></li>
+</ul>
+</li>
+<li>IPW<ul>
+<li>We use the conditional probability of receiving treatment given the stone size to estimate the propensity score.</li>
+<li><span class="math">\(\text{Pr}({Y^{A}=1})=\cfrac{81\times\cfrac{357}{87}+192\times\cfrac{343}{263}}{357+343}=0.833\)</span></li>
+<li><span class="math">\(\text{Pr}({Y^{B}=1})=\cfrac{234\times\cfrac{357}{270}+55\times\cfrac{343}{80}}{357+343}=0.779\)</span></li>
+</ul>
+</li>
+</ul>
+<p>We can see the results are identical and Treatment A is actually better than Treatment B. This is because treatment B gets assigned more “easy cases” whose stone sizes are small. We can see that the IPW essentially expands the population for two stone sizes to equal size. Specifically, for the small stone, the pseudo population has 357 people for A and 357 for B. On the other hand, the large stone group has 343 for both treatments. In this way, stone size is no longer a confounding factor for treatment effectiveness.  </p>
+<h2 id="3-causal-graph">3. Causal Graph</h2>
+<h3 id="31-backdoor-adjustment">3.1 Backdoor Adjustment</h3>
+<p>The most common causal graph is the following one. </p>
+<p><a href="https://lucid.app/lucidchart/e46f8b0b-a02e-48fd-8ac4-913d3292d8f4/edit?viewport_loc=-102%2C-20%2C2541%2C1272%2C0_0&amp;invitationId=inv_df515617-52a8-40a4-bd7c-4b3463bbd1b3">https://lucid.app/lucidchart/e46f8b0b-a02e-48fd-8ac4-913d3292d8f4/edit?viewport_loc=-102%2C-20%2C2541%2C1272%2C0_0&amp;invitationId=inv_df515617-52a8-40a4-bd7c-4b3463bbd1b3</a></p>
+<p>In this causal graph, association flows along the non-directional path T→X→Y, called the <strong>backdoor path</strong>, and the directional paths X→Y and T→Y are causal. If we use the backdoor adjustment by conditioning on X, then we would identify the causal effect of T. </p>
+<p>The backdoor criterion states that a set of variables <span class="math">\(W\)</span> satisfies the backdoor criteria relative to <span class="math">\(T\)</span> and <span class="math">\(Y\)</span> if </p>
+<ul>
+<li><span class="math">\(W\)</span> blocks all backdoor paths from <span class="math">\(T\)</span> to <span class="math">\(Y\)</span>.</li>
+<li><span class="math">\(W\)</span> does not contain any descendants of <span class="math">\(T\)</span></li>
+</ul>
+<p>Intuitively, the criterion stem from examining the causal relationship in the following basic building blocks, namely the chain, fork, and collider. </p>
+<p><a href="https://lucid.app/lucidchart/e46f8b0b-a02e-48fd-8ac4-913d3292d8f4/edit?viewport_loc=-102%2C-20%2C2541%2C1272%2C0_0&amp;invitationId=inv_df515617-52a8-40a4-bd7c-4b3463bbd1b3">https://lucid.app/lucidchart/e46f8b0b-a02e-48fd-8ac4-913d3292d8f4/edit?viewport_loc=-102%2C-20%2C2541%2C1272%2C0_0&amp;invitationId=inv_df515617-52a8-40a4-bd7c-4b3463bbd1b3</a></p>
+<p>Based on the Bayesian network factorization, we can easily prove that</p>
+<ul>
+<li>For chain and fork, if we condition on <span class="math">\(X_2\)</span>, <span class="math">\(X_1\)</span> and <span class="math">\(X_3\)</span> is conditionally independent.</li>
+<li>For collider, if we don’t condition on <span class="math">\(X_2\)</span>, <span class="math">\(X_1\)</span> and <span class="math">\(X_3\)</span> is conditionally independent. Conditioning on a collider may introduce spurious positive or negative association that does not exist for <span class="math">\(X_1\)</span> and <span class="math">\(X_3\)</span> .<ul>
+<li>Brady Neal’s book discusses the seemingly plausible observation that the “Good-looking men are jerks”: most of the nice men one meets are not very good-looking while most of the good-looking men are jerks. It seems that kindness and looks are negatively associated. There is actually a third important variable: availability. The previous observation is actually conditioned on a collider, namely availability. The looks and kindness are NOT associated in general population. But when we condition on their shared child <span class="math">\(X_2\)</span> (availability = Yes) here, they become associated. The association now flows along the path <span class="math">\(X_3→X_2←X_1\)</span> despite the fact that it does not when we don’t condition on <span class="math">\(X_2\)</span>.</li>
+<li>Imagine a study aiming to explore the relationship between two variables: the amount of time spent on social media and personal happiness levels. Conventional wisdom and some research suggest these variables might be independent or even negatively correlated in the general population, with excessive social media use potentially linked to lower happiness levels. However, let's introduce a third variable and see how it affects the observed relationship. Public visibility of social media activity, which can be influenced by both the amount of time spent on social media and personal happiness. For example, individuals who spend a lot of time on social media might post more often, and those who are happier might share more positive content, making their activity more visible and engaging. Suppose we conduct a study focusing only on individuals with high public visibility of their social media activity. This selection criteria (the collider) can introduce a spurious positive association between social media usage and happiness. Why? Because the subgroup of users with high visibility likely includes people who are either spending a lot of time on social media (regardless of their happiness level) or are particularly happy (thus sharing more positive content), or both. By conditioning on the collider (public visibility of social media activity), the study might erroneously conclude that higher social media usage is associated with greater personal happiness among the subgroup, even if these variables are independent or negatively correlated in the general population.</li>
+</ul>
+</li>
+</ul>
+<h3 id="32-front-door-adjustment-todo">3.2 Front-Door Adjustment (TODO)</h3>
+<h2 id="4-estimation">4. Estimation</h2>
+<p>We have the observational data sample <span class="math">\(\mathcal{D}= \lbrace{({Y_i, X_i, T_i})}\rbrace_{i=1}^n\)</span> with <span class="math">\(({Y_i, X_i, T_i}) \stackrel{i.i.d}{\sim} \mathbb{P}\)</span>. Under the identification assumptions, namely unconfoundedness, positivity, and consistency, we define the propensity score as the following equation. </p>
+<div class="math">\begin{equation}
+\pi(x)=P(T=1\mid{X=x})
+\end{equation}</div>
+<p>We also define the conditional outcome as the following equation. </p>
+<div class="math">$$\mu_t(x)=\mathbb{E}_{\mathbb{P}}\lbrack{Y\mid{T=t, X=x}}\rbrack$$</div>
+<p>We assume no parametric form for these parameters and therefore this is a non-parametric estimation problem. The various estimation methods are mainly characterized by two aspects:</p>
+<ul>
+<li>How the nuisance parameters <span class="math">\(\eta=(\mu_0(x), \mu_1(x), \pi(x))\)</span> are estimated: the parametric form, the model used.</li>
+<li>How to combine/use these estimates.</li>
+</ul>
+<h3 id="41-plug-in-estimators">4.1 Plug-in Estimators</h3>
+<p>The quantities of interests are ATE and CATE and ATT. CATE is also known as individualized average treatment effects (IATEs). Recall we define ATE as follows. </p>
+<div class="math">\begin{equation}
+\mathbb{E}\lbrack{Y({1})}-Y({0})\rbrack = \mathbb{E}_\mathbb{X}\lbrace\mathbb{E}\lbrack{Y}\mid{T=1, X}\rbrack-\mathbb{E}\lbrack{Y}\mid{T=0, X}\rbrack\rbrace 
+\end{equation}</div>
+<p>We can fit a statistical or machine learning model to estimate the conditional expectation <span class="math">\(\mathbb{E}\lbrack{Y}\mid{T, X}\rbrack\rbrace\)</span> and then approximate the outer expectation <span class="math">\(\mathbb{E}_\mathbb{X}\)</span> with its emprical mean over <span class="math">\(n\)</span> data points. If we use <span class="math">\(\mu({1, x})\)</span> and </p>
+<p><span class="math">\(\mu({0, x})\)</span> to denote the two conditional expectations, we can estimate ATE as</p>
+<div class="math">\begin{equation}
+\hat{\tau}=\frac{1}{n}\sum_{\substack{i}}\lbrack{\hat{\mu}({1, x_i})-\hat{\mu}({0, x_i})}\rbrack \enspace \small{\text{(ATE)}} 
+\end{equation}</div>
+<p>To estimate CATE, we can select those observations that have <span class="math">\(x_i=x\)</span>. </p>
+<div class="math">\begin{equation}
+\hat{\tau}({x})=\frac{1}{n_x}\sum_{\substack{i:x_i=x}}\lbrack{\hat{\mu}({1, x_i})-\hat{\mu}({0, x_i})}\rbrack \enspace \small{\text{(CATE)}} 
+\end{equation}</div>
+<p>The estimator in Eq.(13) for CATE is likely prone to positivity violation since positivity needs to be satisfied for all levels of <span class="math">\(X\)</span>. For the estimators in Eq.(12) and (13), if we use the treatment as a covariate in a single model for the two outcome, then this estimator is called S-estimator since we only fit one model for <span class="math">\(\mu\)</span>. Other names are conditional outcome model, standardization, and parametric G-formula. S-learner could bias towards zero since <span class="math">\(X\)</span> is usually high-dimensional (See <a href="https://www.notion.so/Metalearners-for-estimating-heterogeneous-treatment-effects-using-machine-learning-d426b40388e04ae3a5afdac4579c8690?pvs=21">Metalearners for estimating heterogeneous treatment effects using machine learning</a>). T-learner fits two separate models for values of treatment to ensure that <span class="math">\(T\)</span> cannot be ignored. </p>
+<p>Another estimator called “X-learner” is different from both S-learner and T-learner since it has three steps. </p>
+<ol>
+<li>Fit the outcome models as the T-learner.</li>
+<li>Fit two estimators for IATEs. </li>
+<li>Combine the two estimators as a weighted average. Propensity score is suggested to work well. </li>
+</ol>
+<p>The paper <a href="https://www.notion.so/Nonparametric-Estimation-of-Heterogeneous-Treatment-Effects-From-Theory-to-Learning-Algorithms-0ed9416eb16c457ea93263c9b1bf58d6?pvs=21">Nonparametric Estimation of Heterogeneous Treatment Effects: From Theory to Learning Algorithms</a>) suggests that we can directly regress the following pseudo-outcome directly on covariates. The model can be used to directly estimate CATE. </p>
+<p>\tilde{Y} = W(Y-\hat{\mu}({0, X})+(1-W)(\hat{\mu}({1, X})-Y)</p>
+<h3 id="42-representation-learning-methods">4.2 Representation Learning Methods</h3>
+<p>A variety of deep learning based methods use neural networks to transform the covariates to a representation space where then the nuisance parameters are then modeled. This representation is usually learned by posing the desirable properties for causal inferencing as the constraints on the form of NN objective functions. For example, covariate balance is a desirable property that would give us conditional exchangeability. We therefore can learn a common representation for both outcome or even the treatment assignment. This representation is then shared and would have covariate balance. </p>
+<h3 id="example-nns-todo">Example NNs (TODO)</h3>
+<h3 id="43-tree-based-methods">4.3 Tree-based Methods</h3>
+<h3 id="44-methods-for-multi-valued-and-continuous-treatment">4.4 Methods for Multi-valued and Continuous Treatment</h3>
+<h4 id="441-generalized-propensity-score">4.4.1 Generalized Propensity Score</h4>
+<p>A common method for dealing with multi-valued and continuous treatment is the generalized propensity score. It is developed in <a href="https://www.notion.so/The-propensity-score-with-continuous-treatments-eada4426a0c849088465ee5774655e45?pvs=21">The propensity score with continuous treatments</a>. </p>
+<p>Let <span class="math">\(r(t, x)\)</span> be the conditional density of the treatment given the covariates</p>
+<div class="math">$$
+r(t, x)=f_{T|X}(t\mid{x})
+$$</div>
+<p>Then the generalized propensity score is <span class="math">\(R=r(T, X)\)</span></p>
+<p>We can follow the procedure below to use the GPS. </p>
+<ul>
+<li>In the first stage, we use a normal distribution for the treatment given the covariates. We may consider more general models such as mixtures of normals, or heteroskedastic normal distributions with the variance being a parametric function of the covariates. We estimate the parameter by maximum likelihood.</li>
+</ul>
+<div class="math">$$
+T_i | X_i \sim \mathcal{N}(\beta_0 + \beta' X_i, \sigma^2)
+$$</div>
+<div class="math">$$
+\hat{R}_i = \frac{1}{\sqrt{2\pi \sigma^2}} \exp \left( -\frac{1}{2\sigma^2} (T_i - \hat{\beta}_0 - \hat{\beta}' X_i)^2 \right).
+$$</div>
+<ul>
+<li>In the second stage, we model the conditional expectation of <span class="math">\(Y_i\)</span> given <span class="math">\(T_i\)</span> and <span class="math">\(R_i\)</span> as a flexible function of its two arguments. For example, we can use the following quadratic equation.</li>
+</ul>
+<div class="math">$$
+E[Y_i | T_i, R_i] = \alpha_0 + \alpha_1 T_i + \alpha_2 T_i^2 + \alpha_3 R_i + \alpha_4 R_i^2 + \alpha_5 T_i R_i.
+$$</div>
+<ul>
+<li>Given the estimated parameter in the second stage, we estimate the average potential outcome at treatment level <span class="math">\(t\)</span> as</li>
+</ul>
+<div class="math">$$
+\hat{E}[Y(t)] = \frac{1}{N} \sum_{i=1}^{N} \left( \hat{\alpha}_0 + \hat{\alpha}_1 t + \hat{\alpha}_2 t^2 + \hat{\alpha}_3 \hat{r}(t, X_i) + \hat{\alpha}_4 \hat{r}(t, X_i)^2 + \hat{\alpha}_5 t \hat{r}(t, X_i) \right).
+$$</div>
+<p>Another way of using the GPS is given in What-If book and the method is very similar to applying the regular propensity score to create a pseudo-population. </p>
+<ul>
+<li>First step is estimate the stabilized weights as <span class="math">\(SW^T = f(T)/f(T\mid{X})\)</span>. We could make parametric assumptions on both densities such as Gaussian distribution.</li>
+<li>Compute the weights using the estimated densities then fit a weighted regression model for the outcome with covariates.</li>
+</ul>
+<script type="text/javascript">if (!document.getElementById('mathjaxscript_pelican_#%@#$@#')) {
+    var align = "center",
+        indent = "0em",
+        linebreak = "false";
+
+    if (false) {
+        align = (screen.width < 768) ? "left" : align;
+        indent = (screen.width < 768) ? "0em" : indent;
+        linebreak = (screen.width < 768) ? 'true' : linebreak;
+    }
+
+    var mathjaxscript = document.createElement('script');
+    mathjaxscript.id = 'mathjaxscript_pelican_#%@#$@#';
+    mathjaxscript.type = 'text/javascript';
+    mathjaxscript.src = 'https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.3/latest.js?config=TeX-AMS-MML_HTMLorMML';
+
+    var configscript = document.createElement('script');
+    configscript.type = 'text/x-mathjax-config';
+    configscript[(window.opera ? "innerHTML" : "text")] =
+        "MathJax.Hub.Config({" +
+        "    config: ['MMLorHTML.js']," +
+        "    TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'none' } }," +
+        "    jax: ['input/TeX','input/MathML','output/HTML-CSS']," +
+        "    extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']," +
+        "    displayAlign: '"+ align +"'," +
+        "    displayIndent: '"+ indent +"'," +
+        "    showMathMenu: true," +
+        "    messageStyle: 'normal'," +
+        "    tex2jax: { " +
+        "        inlineMath: [ ['\\\\(','\\\\)'] ], " +
+        "        displayMath: [ ['$$','$$'] ]," +
+        "        processEscapes: true," +
+        "        preview: 'TeX'," +
+        "    }, " +
+        "    'HTML-CSS': { " +
+        "        availableFonts: ['STIX', 'TeX']," +
+        "        preferredFont: 'STIX'," +
+        "        styles: { '.MathJax_Display, .MathJax .mo, .MathJax .mi, .MathJax .mn': {color: 'black ! important'} }," +
+        "        linebreaks: { automatic: "+ linebreak +", width: '90% container' }," +
+        "    }, " +
+        "}); " +
+        "if ('default' !== 'default') {" +
+            "MathJax.Hub.Register.StartupHook('HTML-CSS Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax['HTML-CSS'].FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+            "MathJax.Hub.Register.StartupHook('SVG Jax Ready',function () {" +
+                "var VARIANT = MathJax.OutputJax.SVG.FONTDATA.VARIANT;" +
+                "VARIANT['normal'].fonts.unshift('MathJax_default');" +
+                "VARIANT['bold'].fonts.unshift('MathJax_default-bold');" +
+                "VARIANT['italic'].fonts.unshift('MathJax_default-italic');" +
+                "VARIANT['-tex-mathit'].fonts.unshift('MathJax_default-italic');" +
+            "});" +
+        "}";
+
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(configscript);
+    (document.body || document.getElementsByTagName('head')[0]).appendChild(mathjaxscript);
+}
+</script>
+            </div>
+            <!-- /.entry-content -->
+    <hr/>
+    <section class="comments" id="comments">
+        <h2>Comments</h2>
+
+        <div id="disqus_thread"></div>
+        <script type="text/javascript">
+            /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+            var disqus_shortname = 'xys234-github-io'; // required: replace example with your forum shortname
+
+            var disqus_config = function () {
+                this.language = "en";
+
+                        this.page.identifier = '2024-09-15-causal-inference-basics';
+            };
+
+            /* * * DON'T EDIT BELOW THIS LINE * * */
+            (function () {
+                var dsq = document.createElement('script');
+                dsq.type = 'text/javascript';
+                dsq.async = true;
+                dsq.src = '//' + disqus_shortname + '.disqus.com/embed.js';
+                (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+            })();
+        </script>
+        <noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by
+            Disqus.</a></noscript>
+        <a href="http://disqus.com" class="dsq-brlink">comments powered by <span class="logo-disqus">Disqus</span></a>
+
+    </section>
+        </article>
+    </section>
+
+        </div>
+    </div>
+</div>
+<!-- End Content Container -->
+
+<footer>
+   <div class="container">
+      <hr>
+      <div class="row">
+         <div class="col-xs-10">&copy; 2024 - 2024 Weihao Yin
+            <!-- &middot; Powered by <a href="https://github.com/getpelican/pelican-themes/tree/master/pelican-bootstrap3" target="_blank">pelican-bootstrap3</a>, -->
+            <!-- <a href="http://docs.getpelican.com/" target="_blank">Pelican</a>,
+            <a href="http://getbootstrap.com" target="_blank">Bootstrap</a> -->         </div>
+         <div class="col-xs-2"><p class="pull-right"><i class="fa fa-arrow-up"></i> <a href="#">Back to top</a></p></div>
+      </div>
+   </div>
+</footer>
+<script type="text/javascript">
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true,
+        tags: 'ams', // Enable numbering for AMS environments like 'equation'
+        // tags: 'all', // Use this instead to number all displayed equations
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code'],
+      },
+      loader: {
+        load: ['[tex]/ams'] // Ensure the 'ams' extension is loaded
+      }
+    };
+</script>
+
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+<script src="/theme/js/jquery.min.js"></script>
+
+<!-- Include all compiled plugins (below), or include individual files as needed -->
+<script src="/theme/js/bootstrap.min.js"></script>
+
+<!-- Enable responsive features in IE8 with Respond.js (https://github.com/scottjehl/Respond) -->
+<script src="/theme/js/respond.min.js"></script>
+
+
+    <!-- Disqus -->
+    <script type="text/javascript">
+        /* * * CONFIGURATION VARIABLES: EDIT BEFORE PASTING INTO YOUR WEBPAGE * * */
+        var disqus_shortname = 'xys234-github-io'; // required: replace example with your forum shortname
+
+        /* * * DON'T EDIT BELOW THIS LINE * * */
+        (function () {
+            var s = document.createElement('script');
+            s.async = true;
+            s.type = 'text/javascript';
+            s.src = '//' + disqus_shortname + '.disqus.com/count.js';
+            (document.getElementsByTagName('HEAD')[0] || document.getElementsByTagName('BODY')[0]).appendChild(s);
+        }());
+    </script>
+    <!-- End Disqus Code -->
+
+
+</body>
+</html>

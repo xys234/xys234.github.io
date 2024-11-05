@@ -1,0 +1,107 @@
+/* Overall highlight container */
+.highlight {
+    background: #1e1e1e;
+    margin: 1em 0;
+    border-radius: 4px;
+    overflow: auto;
+    border: none;
+    color: #d4d4d4;
+    padding: 0.5rem;  /* Added overall padding */
+}
+
+/* Reset table styles completely */
+.highlight table {
+    margin: 0 !important;
+    padding: 0;
+    border: none !important;
+    border-spacing: 0;
+    border-collapse: collapse;
+    width: 100%;
+    display: table;
+    background: transparent;
+}
+
+/* Remove ALL borders from table cells */
+.highlight td,
+.highlight td.table-cell {
+    margin: 0;
+    padding: 0;
+    border: none !important;
+    vertical-align: top;
+    background: transparent !important;
+    box-shadow: none !important;
+}
+
+/* Style for line numbers */
+.highlight .linenos {
+    color: #666;
+    padding: 0.5em 1em;  /* Increased padding */
+    text-align: right;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+    min-width: 3em;
+    background: #252525 !important;
+}
+
+/* Style for code */
+.highlight .code {
+    padding: 0.5em 1.5em;  /* Increased padding */
+    width: 100%;
+}
+
+/* Remove any pre margins and ensure consistent font size */
+.highlight pre {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;  /* Adjusted to 12px */
+    line-height: 1.5;
+    border: none !important;
+    background: transparent !important;
+}
+
+/* Syntax highlighting colors - VSCode-like dark theme */
+.highlight .k { color: #569cd6; }  /* Keyword */
+.highlight .s { color: #ce9178; }  /* String */
+.highlight .n { color: #d4d4d4; }  /* Name */
+.highlight .p { color: #d4d4d4; }  /* Punctuation */
+.highlight .o { color: #d4d4d4; }  /* Operator */
+.highlight .c1 { color: #6A9955; } /* Comment */
+.highlight .kc { color: #569cd6; } /* Keyword.Constant */
+.highlight .s1 { color: #ce9178; } /* String.Single */
+.highlight .s2 { color: #ce9178; } /* String.Double */
+.highlight .mi { color: #b5cea8; } /* Number */
+.highlight .nb { color: #569cd6; } /* Built-in */
+.highlight .nf { color: #dcdcaa; } /* Function name */
+.highlight .nn { color: #d4d4d4; } /* Namespace */
+.highlight .kn { color: #569cd6; } /* Import keyword */
+.highlight .w { color: #d4d4d4; }  /* Text.Whitespace */
+
+/* Optional: subtle separator between line numbers and code */
+.highlight .linenos::after {
+    content: "";
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: rgba(255,255,255,0.1);
+}
+
+table {
+    width: 80%;
+    margin: 20px 0;
+    border-collapse: collapse;
+}
+
+table th, table td {
+    padding: 8px;
+    text-align: left;
+    border: 1px solid #ddd;
+}
+
+/* Add some breathing room between lines */
+table td {
+    line-height: 1.4;
+}
